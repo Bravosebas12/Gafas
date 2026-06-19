@@ -1,0 +1,159 @@
+pages 5
+
+--- PAGE 1 ---
+ESPECIFICACIÓN DE
+REQUERIMIENTOS Y DISEÑO DE
+ARQUITECTURA .NET & BLAZOR
+Sistema Integral de Gestión de Inventario y Punto de Venta (POS) para
+Óptica
+Documento Técnico de Ingeniería de Software
+Estado: Especificación Revisada (v1.1)
+Fecha de Generación: Junio 2026
+Ecosistema Tecnológico: .NET 10 & Blazor WebAssembly 
+Sistema de Gestión de Óptica — Confidencial 1
+
+--- PAGE 2 ---
+1. Introducción y Alcance del Sistema
+El presente documento define los requerimientos funcionales y no funcionales detallados, junto con los
+lineamientos de arquitectura para la construcción del sistema de gestión comercial y clínica de la óptica. El
+objetivo  principal  es  centralizar  la  operación  del  negocio,  mitigando  errores  en  el  manejo  de  inventario
+especializado de salud visual y optimizando el flujo de facturación.
+2. Especificación de Requerimientos del Sistema (SRS)
+2.1. Módulo: Autenticación y Control de Acceso (Login)
+ID / Atributo Descripción Detallada
+Descripción Mecanismo de seguridad centralizado para validar la identidad de los operarios e
+implementar control de acceso basado en roles (RBAC).
+Requerimientos
+Funcionales
+RF-LOG-01: El sistema debe validar credenciales de forma nativa consultando una
+base de datos SQL propia. Queda estrictamente prohibida la integración con
+proveedores de autenticación externos (ej. Google, Microsoft, Facebook).
+RF-LOG-02: Emisión de tokens JWT de corta duración con Refresh Tokens
+almacenados de forma segura.
+RF-LOG-03: Bloqueo automático de cuenta tras 5 intentos fallidos consecutivos
+durante un periodo de 15 minutos.
+RF-LOG-04: Implementación de roles estrictos: Administrador, Vendedor, 
+Optómetra.
+2.2. Módulo: Panel de Control (Dashboard)
+ID / Atributo Descripción Detallada
+Descripción Centro de mando analítico visual que consolida la operación diaria y los indicadores
+clave de rendimiento (KPIs) del negocio en tiempo real.
+Requerimientos
+Funcionales
+RF-DSH-01: Despliegue de métricas financieras de venta del día, del mes en curso
+y comparativa.
+RF-DSH-02: Gráfico de líneas dinámico con el comportamiento del volumen de
+ventas.
+RF-DSH-03: Sección de alertas críticas para productos con existencias por debajo
+del stock mínimo.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+Sistema de Gestión de Óptica — Confidencial 2
+
+--- PAGE 3 ---
+2.3. Módulo: Gestión de Inventario Especializado
+ID / Atributo Descripción Detallada
+Descripción Administración catalogada de existencias comerciales y clínicas diferenciando las
+propiedades inherentes de lentes y monturas.
+Requerimientos
+Funcionales
+RF-INV-01 (Monturas): Registro de ítems parametrizados por marca, modelo,
+código SKU, material, color, tamaño, costo, precio y stock.
+RF-INV-02 (Lentes): Gestión matricial basada en graduación técnica, tipo de
+material y tratamientos aplicados.
+RF-INV-03: Registro histórico de movimientos de Kárdex.
+2.4. Módulo: Administración de Usuarios Internos
+ID / Atributo Descripción Detallada
+Descripción Módulo CRUD para la gestión del talento humano del negocio y auditoría interna de
+accesos.
+Requerimientos
+Funcionales
+RF-USR-01: Creación, modificación y desactivación lógica de usuarios.
+RF-USR-02: Vinculación estricta de perfiles de empleado.
+RF-USR-03: Logs de Auditoría: Registro inalterable de transacciones críticas.
+2.5. Módulo: Configuración Personal
+ID / Atributo Descripción Detallada
+Descripción Panel de autogestión de perfil para el usuario autenticado.
+Requerimientos
+Funcionales
+RF-CFG-01: Actualización de información de contacto básica del usuario.
+RF-CFG-02: Cambio de contraseña aplicando políticas de complejidad fuerte.
+2.6. Módulo: Punto de Venta (Ventas y Facturación)
+ID / Atributo Descripción Detallada
+Descripción Motor central transaccional del negocio, encargado de procesar la comercialización y
+facturación.
+Requerimientos
+Funcionales
+RF-VNT-01: Creación de órdenes de venta asociando ítems de inventario
+(Monturas) y servicios.
+RF-VNT-02 (Fórmula Obligatoria): Cuando en la transacción de venta se incluya
+un lente, el sistema exigirá obligatoriamente diligenciar la fórmula optométrica. Esta
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+Sistema de Gestión de Óptica — Confidencial 3
+
+--- PAGE 4 ---
+ID / Atributo Descripción Detallada
+fórmula deberá ser guardada y vinculada directamente al historial del cliente y a la
+orden de trabajo respectiva.
+RF-VNT-03: Soporte de pagos parciales (Anticipos o Abonos) para mandar a
+fabricar lentes a laboratorio, con control de estados de cuenta de la orden.
+RF-VNT-04: Multi-método de pago con liquidación de impuestos y generación de
+tickets.
+2.7. Módulo: Gestión de Clientes e Historial Clínico
+ID / Atributo Descripción Detallada
+Descripción Expediente unificado del cliente que cruza su información demográfica, historial de
+compras, estados de cuentas de saldos y registros de optometría.
+Requerimientos
+Funcionales
+RF-CLI-01: Ficha de registro del cliente con datos de contacto.
+RF-CLI-02: Registro inalterable de exámenes de optometría detallando agudeza
+visual y refracción.
+RF-CLI-03: Consolidado comercial visible para el vendedor que incluya el histórico
+de compras.
+• 
+• 
+• 
+• 
+• 
+Sistema de Gestión de Óptica — Confidencial 4
+
+--- PAGE 5 ---
+3. Documento de Arquitectura y Guía de Desarrollo Técnico
+Para garantizar la mantenibilidad, extensibilidad y un alto estándar de ingeniería, el software se diseñará bajo
+los principios de  Clean Architecture (Arquitectura Cebolla) combinado con patrones de segregación de
+responsabilidades de consultas y comandos  (CQRS). El frontend se implementará de manera nativa con
+Blazor WebAssembly (.NET 10).
+3.1. Estructura de la Solución
+OpticaSolution/
+├── src/
+│   ├── 1. Core/
+│   │   ├── Optica.Domain/
+│   │   └── Optica.Application/
+│   ├── 2. Infrastructure/
+│   │   ├── Optica.Infrastructure/
+│   │   └── Optica.Shared/
+│   └── 3. Presentation/
+│       ├── Optica.API/
+│       └── Optica.Client.Blazor/
+3.2. Arquitectura del Backend: CQRS con MediatR
+Toda lógica de negocio en la capa de Application se dividirá estrictamente bajo el patrón CQRS utilizando la
+librería MediatR.
+3.3. Implementación del Frontend con Blazor WebAssembly
+El proyecto aprovechará el modelo de ejecución del lado del cliente de Blazor, utilizando librerías como
+MudBlazor para  la  UI  interactiva  y  contenedores  de  estado  en  memoria  para  la  gestión  del  POS  sin
+recargas.
+Sistema de Gestión de Óptica — Confidencial 5
