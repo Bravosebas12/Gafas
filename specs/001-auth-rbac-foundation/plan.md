@@ -61,7 +61,9 @@ clave entre 200 y 400 ms
 
 **Constraints**: sin proveedores de identidad externos; sin secretos en el repositorio; sin
 cambios de esquema; toda entrada y salida asíncrona con token de cancelación propagado hasta el
-repositorio; marcas de tiempo en UTC sobre una única fuente
+repositorio; marcas de tiempo en UTC sobre una única fuente; **contraseña de 8 a 12 caracteres**
+(FR-003a), rango que se valida completo al establecerla y solo en su tope al ingresar, para no
+romper el mensaje genérico único de FR-004
 
 **Scale/Scope**: una sede, tres roles, del orden de 10 usuarios internos concurrentes. El alcance
 de interfaz de esta feature es **una sola pantalla**, la de ingreso; el resto llega con sus
@@ -69,7 +71,7 @@ módulos
 
 **Unknowns**: ninguno. Los tres marcadores de clarificación de la especificación quedaron
 resueltos antes de este plan, y las decisiones técnicas abiertas se cerraron en
-[research.md](./research.md) (D-01 a D-12)
+[research.md](./research.md) (D-01 a D-13, más D-01a sobre la longitud de la contraseña)
 
 ---
 
@@ -194,11 +196,12 @@ los cuatro. Contraste verificado sobre los tokens de `docs/PLAN-MAQUETACION.md`.
 
 ## Complexity Tracking
 
-> Las diez compuertas están en verde. Las tres primeras filas no son violaciones de la
-> constitución, sino desviaciones respecto a documentos previos del proyecto. La cuarta **sí es una
-> desviación de la constitución**: el principio IV fija xUnit como marco de pruebas y la suite de
-> navegador usa NUnit. Se registra aquí porque el apartado de cumplimiento lo exige —"una
-> desviación no registrada es un defecto"— y queda acotada a un único proyecto.
+> Las diez compuertas están en verde. Las cuatro primeras filas no son violaciones de la
+> constitución, sino desviaciones respecto a documentos previos del proyecto. Las dos últimas **sí
+> son desviaciones normativas**: una del principio IV, que fija xUnit como marco de pruebas
+> mientras la suite de navegador usa NUnit; y otra de los estándares de seguridad externos, por el
+> tope de longitud de la contraseña. Se registran aquí porque el apartado de cumplimiento lo exige
+> —"una desviación no registrada es un defecto"—, y cada una queda acotada a un alcance concreto.
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
@@ -207,6 +210,7 @@ los cuatro. Contraste verificado sobre los tokens de `docs/PLAN-MAQUETACION.md`.
 | Se crea `Optica.Web.Client` sin ningún componente | Es el único mecanismo que fuerza la compilación de `Optica.Shared` para WebAssembly, verificación exigida por el principio II (D-10) | Esperar a la feature del POS significa descubrir la violación cuando `Shared` ya acumule dependencias de servidor, y con el POS bajo presión de entrega |
 | Detección de reutilización de credencial de renovación sin columna de encadenamiento | El esquema no tiene `REPLACED_BY_ID` y el principio X prohíbe inventar columnas; el estado de `REVOKED_AT` es suficiente para el alcance de FR-013 (D-05) | Proponer un cambio de esquema por una capacidad forense que ninguna regla de la especificación pide |
 | **NUnit en `tests/Optica.E2E.Tests/`, contra el "xUnit para .NET" del principio IV** | `Microsoft.Playwright.NUnit` es la integración oficial de Playwright para .NET: aporta el aislamiento de contexto de navegador por prueba, el cierre determinista y la captura de traza, video y pantalla por configuración. El aislamiento por prueba es justo la parte que, mal hecha, produce suites de navegador intermitentes (D-13) | Escribir el andamiaje a mano sobre xUnit mantiene la uniformidad de marco, pero nos obliga a mantener lo que el paquete oficial ya mantiene. La desviación queda acotada a un solo proyecto, que además está fuera del cálculo de cobertura: los cuatro proyectos de dominio, aplicación, integración y arquitectura siguen en xUnit sin excepción |
+| **Tope de 12 caracteres en la contraseña, contra el mínimo de 64 que exige NIST SP 800-63B** | Decisión del responsable del proyecto, registrada en D-01a. El riesgo residual queda acotado por dos mecanismos ya presentes: el bloqueo a los cinco intentos fallidos (FR-017) hace impracticable el ataque en línea, y las 600.000 iteraciones de derivación (D-01) encarecen el ataque fuera de línea si la base se filtrara | Un tope de 128, que OWASP ASVS considera aceptable, o de 64, el mínimo que NIST obliga a admitir. Ambos se propusieron y se descartaron. El costo real de la desviación es que **impide las frases de contraseña**, que son la vía más simple para obtener una credencial fuerte y memorable. **Punto de revisión**: si el sistema se expone a internet o se audita contra un marco de cumplimiento, el tope debe subirse; es un único valor en FR-003a, porque ni el esquema ni el algoritmo dependen de la longitud de entrada |
 
 ---
 
