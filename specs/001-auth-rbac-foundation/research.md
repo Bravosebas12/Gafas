@@ -305,3 +305,52 @@ contraseña en el repositorio.
 
 **Alternativa descartada**: sembrar el usuario en `002_seed_catalogos_merge.sql`, junto a los
 roles. Los roles sí son catálogo y ya están ahí, correctamente; una credencial no lo es.
+
+---
+
+## D-13 — Pruebas de navegador de la pantalla de ingreso (SC-001, compuerta G9)
+
+**Decisión**: automatizar con **Playwright** los casos de extremo a extremo de la pantalla de
+ingreso, en un proyecto de prueba propio `tests/Optica.E2E.Tests/`, excluido del cálculo de
+cobertura por capa y etiquetado para no correr en la compilación local rápida. Los quince casos
+están especificados en
+[qa/001-auth-rbac-foundation/casos-de-prueba/login-e2e-playwright.md](../../qa/001-auth-rbac-foundation/casos-de-prueba/login-e2e-playwright.md).
+
+**Rationale**: dos exigencias de esta feature no son verificables por debajo del navegador.
+
+1. **SC-001** mide el recorrido completo desde el envío del formulario hasta ver la pantalla
+   principal, en menos de 3 segundos. Incluye render, red y latencia del cliente. Medido en el
+   servidor se mide otra cosa, y por eso la trazabilidad de QA lo tenía como el único criterio de
+   éxito sin cubrir.
+2. La **compuerta G9** exige los cuatro estados de la vista, recorrido por teclado con foco
+   visible, contraste mínimo y ausencia de información portada solo por el color. Todo eso es
+   estado de interfaz, no de respuesta HTTP. Hasta ahora se apoyaba únicamente en una carta de
+   exploración manual.
+
+**Alcance deliberadamente acotado**: solo la pantalla de ingreso, que es la única de la feature
+según la propia evaluación de G9 en el plan. Los casos de reglas del usuario, del handler y del
+hasheo **no** se pasan a Playwright: no son observables desde el navegador, su cobertura no es
+atribuible a una capa y por tanto no sirve para los umbrales del principio IV, y costarían segundos
+donde su equivalente unitario cuesta milisegundos.
+
+**Dos límites del enfoque, explícitos**:
+
+- **Playwright no puede mover el reloj del servidor.** Los vencimientos de esta feature —bloqueo a
+  los 15 minutos, token de acceso a los 15, sesión a las 8 horas— siguen probándose en integración,
+  donde el reloj se inyecta (D-07). Por navegador sí se **provoca** el bloqueo con cinco envíos,
+  que no requiere avanzar el tiempo.
+- **Playwright no mide la igualación de tiempos de SC-004.** Los 100 milisegundos se miden a nivel
+  HTTP; añadir render y pintado introduce más varianza que la magnitud a medir.
+
+**Pendiente de verificar antes de implementar**: la integración de Playwright para .NET publica
+paquetes oficiales para NUnit y MSTest. Para xUnit, que es el marco de este proyecto, hay que
+comprobar la disponibilidad del paquete de integración en la versión vigente; si no existe, el
+arranque y cierre del navegador se escriben a mano en un `fixture` de xUnit.
+
+**Requisitos de entorno**: host levantado sobre **HTTPS**, porque las cookies llevan `Secure` y
+sobre HTTP el navegador las descarta; base de datos sembrada con las cuentas de prueba; y limpieza
+de estado entre casos, porque el contador de intentos fallidos y el bloqueo persisten en la fila
+del usuario. Reutiliza el andamiaje de D-11 y T026.
+
+**Diagnóstico de fallos**: conservar captura de pantalla, video y traza de Playwright en cada fallo.
+Sin ellos, un fallo en integración continua es irreproducible.

@@ -108,6 +108,22 @@ tests/Optica.Application.Tests/       tests/Optica.Architecture.Tests/
 - [ ] T040 [P] [US1] Mapear los tokens de color y tipografía de `docs/PLAN-MAQUETACION.md` al tema de MudBlazor en `src/3. Presentation/Optica.Web/Componentes/TemaOptica.cs`, sin valores literales (principio IX)
 - [ ] T041 [US1] Implementar la pantalla de ingreso en `src/3. Presentation/Optica.Web/Componentes/Paginas/Login.razor` con render en servidor, los **cuatro estados** de la tabla del plan, foco inicial en el campo de usuario, recorrido completo por teclado y mensaje de error con ícono además del color (compuerta G9)
 
+#### Pruebas de navegador de la pantalla de ingreso (decisión D-13)
+
+Cierran los dos huecos que registra [qa/.../trazabilidad.md](../../qa/001-auth-rbac-foundation/trazabilidad.md): SC-001 sin cubrir, y la compuerta G9 apoyada solo en una carta de exploración manual. Los quince casos están especificados en [qa/.../login-e2e-playwright.md](../../qa/001-auth-rbac-foundation/casos-de-prueba/login-e2e-playwright.md). Van después de T041 porque necesitan la pantalla construida.
+
+- [ ] T041a [US1] Verificar la disponibilidad del paquete de integración de Playwright para **xUnit** en la versión vigente; si no existe, escribir a mano el `fixture` de arranque y cierre del navegador. Registrar el resultado en D-13
+- [ ] T041b [US1] Crear `tests/Optica.E2E.Tests/` con Playwright, **excluido del cálculo de cobertura por capa** del principio IV y etiquetado para no correr en la compilación local rápida
+- [ ] T041c [US1] Levantar el host de prueba sobre **HTTPS** y sembrar las cuentas `jperez`, `mlopez`, `bloqueo1` y `sinrol1` de la tabla de datos del documento de casos, reutilizando el andamiaje de T026. Sobre HTTP el navegador descarta las cookies `Secure` y todos los casos de sesión fallan por un motivo ajeno al que se prueba
+- [ ] T041d [US1] Garantizar la limpieza de estado entre casos: el contador de intentos fallidos y `BLOQUEADO_HASTA` persisten en la fila del usuario, así que un caso que bloquea `bloqueo1` contamina al siguiente
+- [ ] T041e [P] [US1] Implementar CP-E2E-01 y CP-E2E-02: ingreso correcto y medición de **SC-001**, con mediana de 5 corridas por debajo de 3 segundos
+- [ ] T041f [P] [US1] Implementar CP-E2E-03 a CP-E2E-05: los **cuatro estados** de la pantalla, incluido que el estado de carga no admite un segundo envío
+- [ ] T041g [P] [US1] Implementar CP-E2E-06: las cuatro causas de rechazo se ven idénticas en la pantalla, texto y atributos accesibles incluidos (FR-004)
+- [ ] T041h [P] [US1] Implementar CP-E2E-07 a CP-E2E-09 y CP-E2E-15: lector de pantalla, recorrido por teclado con foco visible, 360 píxeles de ancho y contraste mínimo de 4.5 a 1 (compuerta G9)
+- [ ] T041i [P] [US1] Implementar CP-E2E-10: **leer las cookies desde JavaScript y comprobar que no aparecen**. Es la única prueba de que el navegador respeta `HttpOnly`, no solo de que la cabecera lo declara
+- [ ] T041j [P] [US1] Implementar CP-E2E-11 a CP-E2E-14: ausencia de proveedores externos en la pantalla (SC-010), bloqueo provocado con cinco envíos, usuario sin roles, y contraseña no expuesta en el documento ni en la dirección
+- [ ] T041k [US1] Configurar la conservación de captura de pantalla, video y traza en cada fallo. Sin ellos un fallo en integración continua es irreproducible
+
 **Checkpoint**: el ingreso funciona de extremo a extremo y no filtra la existencia de cuentas.
 
 ---

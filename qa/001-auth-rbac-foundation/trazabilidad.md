@@ -5,7 +5,7 @@ tabla donde todo aparece cubierto no sirve de nada; lo que sirve es la sección 
 
 - **Escenarios:** 81, en 5 archivos `.feature`
 - **Requisitos funcionales:** 39 de 39 con al menos un escenario
-- **Criterios de éxito:** 9 de 10 con escenario, 1 sin cubrir
+- **Criterios de éxito:** 10 de 10 cubiertos
 - **Cartas de exploración:** 7
 
 ## Requisitos funcionales
@@ -56,7 +56,7 @@ tabla donde todo aparece cubierto no sirve de nada; lo que sirve es la sección 
 
 | Criterio | Cubierto por | Estado |
 |---|---|---|
-| SC-001 ingreso en menos de 3 segundos | — | **sin cubrir** |
+| SC-001 ingreso en menos de 3 segundos | CP-E2E-02, por navegador con Playwright (D-13) | cubierto |
 | SC-002 jornada de 8 horas sin reescribir contraseña | La sesión vence 8 horas después de la autenticación | cubierto |
 | SC-003 cinco fallos bloquean el 100 % de las veces | El quinto intento fallido consecutivo bloquea la cuenta, más los 3 de concurrencia | cubierto |
 | SC-004 diferencia de tiempo menor a 100 ms | El tiempo de respuesta no permite deducir si una cuenta existe | cubierto |
@@ -79,21 +79,21 @@ tabla donde todo aparece cubierto no sirve de nada; lo que sirve es la sección 
 | G8 log con correlación y sin datos sensibles | 2 escenarios de FR-037 |
 | G10 sin cambios de esquema no propuestos | 3 escenarios de FR-034 |
 
-Sin escenario en esta carpeta: **G2** (casos de uso como comandos y consultas, sin lógica en
-controladores) y **G9** (cuatro estados de vista, teclado, contraste y tokens). G2 se verifica por
-revisión de código, no por prueba ejecutable. G9 corresponde a la pantalla de ingreso y se cubre
-por la carta de exploración E-06 más la checklist de la skill de interfaz; cuando lleguen las
-pantallas del módulo RF-USR merecerá escenarios propios.
+Sin escenario Gherkin en esta carpeta: **G2** (casos de uso como comandos y consultas, sin
+lógica en controladores). Se verifica por revisión de código, no por prueba ejecutable.
+
+**G9** (cuatro estados de vista, teclado, contraste y tokens) queda cubierta por los nueve casos
+de navegador de [login-e2e-playwright.md](casos-de-prueba/login-e2e-playwright.md), decisión
+D-13. La carta de exploración E-06 sigue vigente y **no** se elimina: las herramientas
+automáticas detectan una fracción de los problemas reales de teclado y lector de pantalla.
 
 ## Huecos identificados
 
-**SC-001, ingreso en menos de 3 segundos, no tiene escenario.** Es deliberado y conviene explicar
-por qué. El criterio mide el recorrido completo desde el envío del formulario hasta la pantalla
-principal, lo que incluye render, red y latencia del navegador. Medirlo con un escenario de
-servidor daría un número que no corresponde al criterio, y medirlo de extremo a extremo exige la
-pantalla montada y un entorno representativo, que no existen todavía. Queda como prueba de
-rendimiento a ejecutar cuando la pantalla de ingreso esté construida. Registrarlo como hueco es
-más honesto que cubrirlo con una prueba que mide otra cosa.
+**SC-001 quedó cubierto.** Estuvo registrado como el único criterio de éxito sin cubrir, con el
+argumento de que medirlo desde el servidor mediría otra cosa que el criterio. La decisión D-13 lo
+resuelve por donde correspondía: CP-E2E-02 mide el recorrido completo en el navegador, con la
+mediana de cinco corridas por debajo de 3 segundos. El hueco se documentó antes de que existiera
+la herramienta para cerrarlo, y esa es la razón por la que se pudo cerrar.
 
 **Interacción entre bloqueo y sesiones activas: hueco de especificación, no de pruebas.** La carta
 E-02 lo persigue. FR-017 a FR-019 definen el bloqueo sobre el ingreso y no dicen nada sobre las
@@ -124,6 +124,7 @@ defectos que una revisión de código no ve.
 accesibilidad de E-06: las herramientas automáticas detectan una fracción de los problemas reales
 de teclado y lector de pantalla, y el resto necesita a alguien recorriendo la pantalla.
 
-**No automatizar por ahora.** SC-001, hasta que exista la pantalla y un entorno representativo.
-Automatizar una medición de rendimiento contra un entorno no representativo produce un número que
-nadie puede interpretar, y una prueba que nadie interpreta se acaba desactivando.
+**Automatizar en la suite de navegador, aparte.** Los quince casos de
+[login-e2e-playwright.md](casos-de-prueba/login-e2e-playwright.md). Tardan minutos, no
+milisegundos, así que viven en su propio proyecto, quedan fuera del cálculo de cobertura por capa
+y se ejecutan en integración continua y bajo demanda, no en la compilación local rápida.

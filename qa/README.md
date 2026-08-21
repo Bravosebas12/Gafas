@@ -13,6 +13,7 @@ quedó sin cubrir.
 qa/
 └── <feature>/
     ├── features/          Escenarios Gherkin ejecutables por requisito
+    ├── casos-de-prueba/   Casos especificados, listos para automatizar
     ├── analisis/          Técnicas aplicadas: equivalencias, límites, exploratorias
     └── trazabilidad.md    Requisito ↔ escenario, con la lista de huecos
 ```
@@ -56,6 +57,22 @@ mide la infraestructura en lugar del requisito.
 Las dos primeras producen escenarios Gherkin. La tercera produce cartas de exploración con
 duración y oráculo, no guiones paso a paso: su valor está en lo que el guion no anticipa. Los
 defectos que encuentre se convierten después en escenarios de regresión.
+
+## Niveles de prueba
+
+Cada caso se especifica en el nivel más bajo donde su requisito sea observable. Subirlo de nivel no
+agrega cobertura: agrega tiempo de ejecución y probabilidad de fallo intermitente.
+
+| Nivel | Qué verifica | Dónde se especifica |
+|---|---|---|
+| Unitaria | Reglas de dominio, handlers, validadores, hasheo | `casos-de-prueba/<tema>.md` |
+| Integración | Persistencia, transacciones, concurrencia, contratos HTTP | `casos-de-prueba/<tema>.md` |
+| Navegador | Lo que solo se observa en un navegador real: estados de vista, teclado, foco, contraste, cookies `HttpOnly`, tiempo del recorrido completo | `casos-de-prueba/<tema>-e2e-playwright.md` |
+
+Los casos de navegador se automatizan con **Playwright**, en un proyecto separado y fuera del
+cálculo de cobertura por capa, porque la cobertura que produce un navegador atravesando toda la
+pila no es atribuible a una capa y distorsiona los umbrales del principio IV. La decisión y sus
+límites están en D-13 de `research.md`.
 
 ## Features cubiertas
 
