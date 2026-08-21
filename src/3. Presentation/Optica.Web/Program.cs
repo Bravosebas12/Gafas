@@ -1,9 +1,11 @@
-using Optica.Web.Client.Pages;
 using Optica.Web.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Render en servidor para las pantallas de consulta e islas WebAssembly donde se requiere
+// interactividad, según docs/adr/ADR-001-modelo-presentacion-blazor-web-app.md. La pantalla
+// de ingreso se resuelve en servidor: no necesita interactividad y así evita descargar el
+// runtime antes de autenticar.
 builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
 
