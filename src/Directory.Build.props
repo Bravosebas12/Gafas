@@ -1,0 +1,25 @@
+<Project>
+
+  <!-- Hereda las reglas de la raíz y añade lo propio del código de producción. -->
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+  <!--
+    Decisión D-07: una única fuente de tiempo. Prohibir el reloj del sistema con una regla del
+    analizador y no con una convención es la diferencia entre una regla y una intención: la
+    convención se rompe en la primera prisa, y el desfase resultante solo aparece en producción,
+    cuando un bloqueo dura más o menos de quince minutos reales.
+
+    Aplica solo al código de producción. Las pruebas sí necesitan construir marcas concretas.
+  -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="4.14.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)BannedSymbols.txt" />
+  </ItemGroup>
+
+</Project>

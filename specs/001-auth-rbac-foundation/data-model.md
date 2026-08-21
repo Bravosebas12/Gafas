@@ -213,6 +213,7 @@ importe. No es una regla de la especificación, es deuda anotada.
 | `BLOQUEO_CUENTA` | `Usuarios` | FR-021 |
 | `ASIGNAR_ROL` | `UsuariosRoles` | FR-028 |
 | `QUITAR_ROL` | `UsuariosRoles` | FR-028 |
+| `CIERRE_SESION` | `RefreshTokens` | FR-038, cierre iniciado por el usuario |
 | `REVOCACION_CADENA` | `RefreshTokens` | FR-013, por reutilización detectada |
 | `CREAR_PRIMER_ADMIN` | `Usuarios` | FR-035, con `USUARIO_ACCION` nulo |
 

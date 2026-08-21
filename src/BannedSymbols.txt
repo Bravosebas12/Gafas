@@ -1,0 +1,5 @@
+P:System.DateTime.Now;Usar el TimeProvider inyectado. Única fuente de tiempo, decisión D-07.
+P:System.DateTime.UtcNow;Usar el TimeProvider inyectado. Única fuente de tiempo, decisión D-07.
+P:System.DateTime.Today;Usar el TimeProvider inyectado. Única fuente de tiempo, decisión D-07.
+P:System.DateTimeOffset.Now;Usar el TimeProvider inyectado. Única fuente de tiempo, decisión D-07.
+P:System.DateTimeOffset.UtcNow;Usar el TimeProvider inyectado. Única fuente de tiempo, decisión D-07.
