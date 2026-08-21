@@ -11,3 +11,4 @@
 .github/prompts/speckit.*
 .github/copilot-instructions.md
 .vscode/settings.json
+.claude/skills/speckit-*/
