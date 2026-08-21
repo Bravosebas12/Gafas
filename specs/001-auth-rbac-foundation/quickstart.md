@@ -14,6 +14,15 @@ ejecutables, porque los scripts SQL ya están en el repositorio.
 - SQL Server con autenticación mixta habilitada, si se va a usar el login de aplicación
 - `sqlcmd`
 
+> **Instancia.** Los comandos usan `-S localhost`, pero la instancia de referencia del proyecto es
+> `(localdb)\MSSQLLocalDB` (SQL Server Express LocalDB), porque no exige permisos de administrador
+> para nada: la arranca y reinicia el propio usuario, y ya trae autenticación mixta habilitada.
+> Sustituye `-S localhost` por `-S '(localdb)\MSSQLLocalDB'` para trabajar contra ella. Ver
+> `Scripts/SQL/README.md` para el detalle de ambas instancias.
+>
+> Añade `-f 65001` a todos los `sqlcmd`: los scripts están en UTF-8 y sin ese switch las tildes se
+> corrompen al insertarse.
+
 ---
 
 ## 1. Crear la base de datos
@@ -59,15 +68,33 @@ derechos de definición de esquema**: los cambios de estructura se aplican con l
 usando una cuenta administrativa. La clave se pasa por variable y nunca queda en el archivo, como
 exige el principio VI.
 
-## 5. Configurar los secretos de la aplicación
+## 5. Configurar la conexión y los secretos
 
-Nunca en `appsettings.json`, que está versionado (principio VI, decisión D-08):
+La cadena de conexión de desarrollo ya está en
+`src/3. Presentation/Optica.Web/appsettings.Development.json`, apuntando a LocalDB con
+autenticación integrada de Windows:
+
+```
+Server=(localdb)\MSSQLLocalDB;Database=OpticaDB;Integrated Security=true;TrustServerCertificate=True;MultipleActiveResultSets=True;Application Name=Optica.Web
+```
+
+Está versionada porque **no contiene credenciales**: la identidad la aporta el usuario de Windows
+que ejecuta el proceso. `appsettings.json` sólo declara la clave `ConnectionStrings:OpticaDB` vacía,
+para que el contrato de configuración sea explícito y cada entorno la sobrescriba.
+
+Lo que sí es secreto nunca va a un archivo versionado (principio VI, decisión D-08). Eso incluye la
+clave de firma de tokens, y la cadena de conexión **sólo cuando lleva usuario y contraseña**, por
+ejemplo si se decide correr contra `optica_app` en lugar de autenticación integrada:
 
 ```bash
 cd "src/3. Presentation/Optica.Web"
-dotnet user-secrets set "ConnectionStrings:OpticaDB" "Server=localhost;Database=OpticaDB;Trusted_Connection=True;TrustServerCertificate=True"
 dotnet user-secrets set "Jwt:SigningKey" "<al menos 32 bytes aleatorios>"
+# Sólo si se usa el login SQL en vez de autenticación de Windows:
+dotnet user-secrets set "ConnectionStrings:OpticaDB" "Server=localhost;Database=OpticaDB;User ID=optica_app;Password=<clave>;TrustServerCertificate=True"
 ```
+
+El gestor de secretos tiene precedencia sobre `appsettings.Development.json`, así que basta
+definirla ahí para sobrescribir la de autenticación integrada.
 
 La aplicación **falla al arrancar** si falta la clave de firma o mide menos de 32 bytes. Es
 deliberado: generar una clave temporal en silencio produce el escenario en que cada reinicio
