@@ -342,10 +342,24 @@ donde su equivalente unitario cuesta milisegundos.
 - **Playwright no mide la igualación de tiempos de SC-004.** Los 100 milisegundos se miden a nivel
   HTTP; añadir render y pintado introduce más varianza que la magnitud a medir.
 
-**Pendiente de verificar antes de implementar**: la integración de Playwright para .NET publica
-paquetes oficiales para NUnit y MSTest. Para xUnit, que es el marco de este proyecto, hay que
-comprobar la disponibilidad del paquete de integración en la versión vigente; si no existe, el
-arranque y cierre del navegador se escriben a mano en un `fixture` de xUnit.
+**Marco de pruebas: NUnit, solo en este proyecto.** La suite de navegador usa
+`Microsoft.Playwright.NUnit`, que es la integración oficial de Playwright para .NET. Aporta la clase
+base que abre un contexto de navegador aislado por prueba, el cierre determinista al terminar, y la
+captura de traza, video y captura de pantalla por configuración en lugar de por código. Escribir
+ese andamiaje a mano sobre otro marco significa mantener nosotros lo que el paquete oficial ya
+mantiene, y el aislamiento por prueba es justo la parte que, mal hecha, produce suites de navegador
+intermitentes.
+
+**Desviación del principio IV, registrada**: la constitución fija *"xUnit para .NET"* como marco de
+pruebas. Esta decisión introduce NUnit **exclusivamente en `tests/Optica.E2E.Tests/`**; los cuatro
+proyectos de dominio, aplicación, integración y arquitectura siguen en xUnit sin excepción. La
+desviación queda registrada en Complexity Tracking del plan, según exige el apartado de
+cumplimiento de la constitución. Es una desviación acotada a un proyecto que además está fuera del
+cálculo de cobertura, así que no afecta a los umbrales del principio IV ni a la ejecución rápida.
+
+Si se prefiere uniformidad de marco por encima del andamiaje oficial, la alternativa es escribir el
+arranque y cierre del navegador a mano sobre xUnit —unas veinte líneas más el aislamiento por
+prueba— y esa es la opción que esta decisión descarta.
 
 **Requisitos de entorno**: host levantado sobre **HTTPS**, porque las cookies llevan `Secure` y
 sobre HTTP el navegador las descarta; base de datos sembrada con las cuentas de prueba; y limpieza

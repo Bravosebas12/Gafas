@@ -3,9 +3,10 @@
 Carpeta de artefactos de calidad del repositorio. Contiene los escenarios Gherkin derivados de
 cada especificación y el análisis de técnicas de prueba que los justifica.
 
-No contiene código de automatización. Los escenarios de aquí son la fuente de la que se derivan
-las pruebas xUnit de `tests/`, y la trazabilidad de cada carpeta es la que responde qué requisito
-quedó sin cubrir.
+No contiene código de automatización. Los escenarios de aquí son la fuente de la que se derivan las
+pruebas de `tests/` —xUnit en dominio, aplicación, integración y arquitectura; NUnit con Playwright
+en la suite de navegador—, y la trazabilidad de cada carpeta es la que responde qué requisito quedó
+sin cubrir.
 
 ## Estructura
 
@@ -69,9 +70,11 @@ agrega cobertura: agrega tiempo de ejecución y probabilidad de fallo intermiten
 | Integración | Persistencia, transacciones, concurrencia, contratos HTTP | `casos-de-prueba/<tema>.md` |
 | Navegador | Lo que solo se observa en un navegador real: estados de vista, teclado, foco, contraste, cookies `HttpOnly`, tiempo del recorrido completo | `casos-de-prueba/<tema>-e2e-playwright.md` |
 
-Los casos de navegador se automatizan con **Playwright**, en un proyecto separado y fuera del
-cálculo de cobertura por capa, porque la cobertura que produce un navegador atravesando toda la
-pila no es atribuible a una capa y distorsiona los umbrales del principio IV. La decisión y sus
+Los casos de navegador se automatizan con **Playwright sobre NUnit**
+(`Microsoft.Playwright.NUnit`), en un proyecto separado y fuera del cálculo de cobertura por capa,
+porque la cobertura que produce un navegador atravesando toda la pila no es atribuible a una capa y
+distorsiona los umbrales del principio IV. NUnit es una desviación deliberada del principio IV,
+acotada a ese único proyecto y registrada en Complexity Tracking del plan. La decisión y sus
 límites están en D-13 de `research.md`.
 
 ## Features cubiertas

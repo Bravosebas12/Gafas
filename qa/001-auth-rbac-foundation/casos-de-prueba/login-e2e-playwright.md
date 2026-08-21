@@ -3,6 +3,7 @@
 **Feature:** 001-auth-rbac-foundation · **Historia:** US1 · **Pantalla:** `/login`
 **Implementa:** tarea T041 · **Compuertas:** G9, y cierre de SC-001
 **Complementa:** [login.md](login.md), que especifica los casos de unidad e integración
+**Marco:** Playwright con **NUnit** (`Microsoft.Playwright.NUnit`), decisión D-13
 
 ---
 
@@ -77,7 +78,8 @@ Estos casos no corren sin lo siguiente, y nada de ello existe todavía:
 | HTTPS | Las cookies llevan `Secure`; sobre HTTP el navegador las descarta y todos los casos de sesión fallan por un motivo que no es el que se prueba | T007 |
 | Base de datos con datos conocidos | Las cuentas de la tabla de datos de abajo, sembradas antes de la corrida | T026, D-11 |
 | Estado limpio entre casos | El contador de intentos fallidos y el bloqueo persisten en la fila del usuario: un caso que bloquea `bloqueo1` contamina al siguiente | T026 |
-| Proyecto de prueba propio | Separado de los cuatro existentes, y **excluido del informe de cobertura por capa** | tarea nueva |
+| Proyecto de prueba propio | `tests/Optica.E2E.Tests/` con `Microsoft.Playwright.NUnit`, separado de los cuatro existentes y **excluido del informe de cobertura por capa** | T041a |
+| Navegadores instalados | Playwright los descarga en la máquina; sin ese paso el proyecto compila y ninguna prueba corre | T041b |
 
 ### Datos de prueba sembrados
 
@@ -275,29 +277,40 @@ precondiciones, datos y una tabla de pasos con un resultado observable por paso.
 
 ---
 
-## 4. Decisiones que hay que tomar antes de implementar
+## 4. Cómo se implementan
 
-Estas no las puedo resolver yo, porque cambian el andamiaje del proyecto.
+**Marco de pruebas: NUnit, con `Microsoft.Playwright.NUnit`.** Es la integración oficial de
+Playwright para .NET. Las clases de prueba derivan de su clase base de página, que abre un contexto
+de navegador **aislado por prueba**, lo cierra de forma determinista al terminar, y activa la
+captura de traza, video y pantalla por configuración en lugar de por código repetido en cada caso.
+El aislamiento por prueba es justo la parte que, mal hecha, produce suites de navegador
+intermitentes: dos casos que comparten cookies o almacenamiento local se contaminan y fallan según
+el orden de ejecución.
 
-**Cómo se conduce Playwright desde .NET.** La suite del proyecto usa xUnit. Playwright para .NET
-publica integraciones oficiales para NUnit y MSTest; para xUnit hay que verificar la disponibilidad
-del paquete de integración en la versión vigente, y si no existe, escribir el arranque y cierre del
-navegador a mano en un `fixture` de xUnit, que es unas veinte líneas. **Verificar antes de decidir**:
-no doy por hecho que exista un paquete oficial para xUnit.
+**Esto es una desviación deliberada del principio IV**, que fija xUnit como marco de pruebas del
+proyecto. Queda acotada a `tests/Optica.E2E.Tests/`: los cuatro proyectos de dominio, aplicación,
+integración y arquitectura siguen en xUnit sin excepción. La desviación está registrada en
+Complexity Tracking del plan y justificada en la decisión D-13, como exige el apartado de
+cumplimiento de la constitución. La alternativa descartada era escribir el andamiaje a mano sobre
+xUnit, que mantiene la uniformidad de marco a cambio de mantener nosotros lo que el paquete oficial
+ya mantiene.
 
-**Dónde viven estos casos.** Recomiendo un proyecto nuevo, `tests/Optica.E2E.Tests/`, por tres
-razones: los umbrales de cobertura por capa se miden por proyecto de prueba y este no debe entrar
-en ese cálculo; requiere navegadores instalados, lo que no debe condicionar a quien solo quiere
-correr las pruebas de dominio; y su duración pide una etiqueta propia para excluirlo de la
-ejecución rápida.
+**Dónde viven.** Proyecto propio `tests/Optica.E2E.Tests/`, por tres razones: los umbrales de
+cobertura por capa se miden por proyecto de prueba y este no debe entrar en ese cálculo; requiere
+navegadores instalados, lo que no debe condicionar a quien solo quiere correr las pruebas de
+dominio; y su duración pide una etiqueta propia.
 
-**Cuándo se ejecuta.** Estos quince casos tardan minutos, no milisegundos. Lo razonable es que la
-compilación local corra los cuatro proyectos actuales y que la suite de navegador se ejecute en la
-integración continua y bajo demanda.
+**Cuándo se ejecutan.** Estos quince casos tardan minutos, no milisegundos. La compilación local
+corre los cuatro proyectos de xUnit; la suite de navegador se ejecuta en integración continua y bajo
+demanda.
 
-**Qué se guarda cuando un caso falla.** Playwright puede conservar captura de pantalla, video y
-traza. Sin eso, un fallo en integración continua es irreproducible y termina en "en mi máquina
-pasa".
+**Un paso de instalación que es fácil olvidar.** Playwright necesita descargar los navegadores en la
+máquina. Sin ese paso el proyecto compila y ninguna prueba corre, con un error que no dice lo que
+pasa. Queda documentado en `quickstart.md` como parte de T041b.
+
+**Qué se guarda cuando un caso falla.** Captura de pantalla, video y traza, por configuración de la
+integración de NUnit. Sin eso, un fallo en integración continua es irreproducible y termina en "en
+mi máquina pasa".
 
 ---
 

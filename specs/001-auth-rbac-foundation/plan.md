@@ -44,7 +44,10 @@ por los scripts `000` y `003`; roles sembrados por `002`
 
 **Testing**: xUnit con medición de cobertura por coverlet (exigido por el principio IV),
 `NetArchTest.Rules` para la prueba de arquitectura, `FakeTimeProvider` para vencimientos,
-`Respawn` para aislar pruebas de integración contra una base de datos real
+`Respawn` para aislar pruebas de integración contra una base de datos real. La suite de navegador de
+la pantalla de ingreso usa **Playwright con NUnit** (`Microsoft.Playwright.NUnit`) en un proyecto
+propio, fuera del cálculo de cobertura por capa; decisión D-13 y desviación registrada en
+Complexity Tracking
 
 **Target Platform**: aplicación web servida desde Windows con SQL Server; navegadores de
 escritorio y móviles a partir de 360 píxeles de ancho
@@ -91,7 +94,7 @@ simple que se descartó. Referencia: `.specify/memory/constitution.md` v2.0.0.
 | G9 | Cuatro estados de vista, teclado, contraste y tokens de diseño (IX) | PASA | Aplica a la única pantalla de la feature. Los cuatro estados de la pantalla de ingreso se detallan más abajo; los colores provienen de los tokens de `docs/PLAN-MAQUETACION.md` mapeados al tema de MudBlazor |
 | G10 | Sin cambios de esquema no propuestos sobre el modelo existente (X) | PASA | **Cero cambios de esquema.** El único punto que parecía exigir una columna nueva —detectar la reutilización de una credencial rotada— se resuelve con el estado de `REVOKED_AT`; análisis en D-05 |
 
-**Resultado**: 10 de 10 compuertas en PASA. No hay violaciones que justificar, pero sí tres
+**Resultado**: 10 de 10 compuertas en PASA. No hay violaciones que justificar, pero sí cuatro
 desviaciones deliberadas respecto a documentos previos, registradas en Complexity Tracking.
 
 **Re-evaluación posterior al diseño de Fase 1**: sin cambios. El diseño de entidades de
@@ -191,9 +194,11 @@ los cuatro. Contraste verificado sobre los tokens de `docs/PLAN-MAQUETACION.md`.
 
 ## Complexity Tracking
 
-> Las diez compuertas están en verde. Lo que sigue no son violaciones de la constitución, sino
-> desviaciones respecto a documentos previos del proyecto, que se registran aquí para que la
-> decisión quede rastreable.
+> Las diez compuertas están en verde. Las tres primeras filas no son violaciones de la
+> constitución, sino desviaciones respecto a documentos previos del proyecto. La cuarta **sí es una
+> desviación de la constitución**: el principio IV fija xUnit como marco de pruebas y la suite de
+> navegador usa NUnit. Se registra aquí porque el apartado de cumplimiento lo exige —"una
+> desviación no registrada es un defecto"— y queda acotada a un único proyecto.
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
@@ -201,6 +206,7 @@ los cuatro. Contraste verificado sobre los tokens de `docs/PLAN-MAQUETACION.md`.
 | Seis proyectos de código y cuatro de prueba para una feature con una sola pantalla | La estructura la fija el principio II como no negociable, y los umbrales de cobertura por capa exigen poder atribuir la medición a cada capa | Una solución de dos proyectos sería más simple hoy y habría que partirla en la feature 2, con las 25 restantes ya escritas encima |
 | Se crea `Optica.Web.Client` sin ningún componente | Es el único mecanismo que fuerza la compilación de `Optica.Shared` para WebAssembly, verificación exigida por el principio II (D-10) | Esperar a la feature del POS significa descubrir la violación cuando `Shared` ya acumule dependencias de servidor, y con el POS bajo presión de entrega |
 | Detección de reutilización de credencial de renovación sin columna de encadenamiento | El esquema no tiene `REPLACED_BY_ID` y el principio X prohíbe inventar columnas; el estado de `REVOKED_AT` es suficiente para el alcance de FR-013 (D-05) | Proponer un cambio de esquema por una capacidad forense que ninguna regla de la especificación pide |
+| **NUnit en `tests/Optica.E2E.Tests/`, contra el "xUnit para .NET" del principio IV** | `Microsoft.Playwright.NUnit` es la integración oficial de Playwright para .NET: aporta el aislamiento de contexto de navegador por prueba, el cierre determinista y la captura de traza, video y pantalla por configuración. El aislamiento por prueba es justo la parte que, mal hecha, produce suites de navegador intermitentes (D-13) | Escribir el andamiaje a mano sobre xUnit mantiene la uniformidad de marco, pero nos obliga a mantener lo que el paquete oficial ya mantiene. La desviación queda acotada a un solo proyecto, que además está fuera del cálculo de cobertura: los cuatro proyectos de dominio, aplicación, integración y arquitectura siguen en xUnit sin excepción |
 
 ---
 
