@@ -22,3 +22,20 @@
 
 # MCP local: contiene credenciales de la BD local, no versionar
 .mcp.json
+
+# .NET - artefactos de compilacion (feature 001)
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+*.user
+*.suo
+*.userprefs
+TestResults/
+coverage*.json
+coverage*.xml
+coverage*.info
+*.coverage
+.vs/
+
+# Secretos de usuario nunca se versionan (principio VI); viven fuera del repositorio

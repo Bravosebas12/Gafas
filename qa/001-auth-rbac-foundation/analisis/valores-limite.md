@@ -33,10 +33,26 @@ sistema estaría rechazando entradas legítimas que la columna admite.
 | 256 | máximo exacto | 401 |
 | 257 | por encima del máximo | 400 |
 
-El límite superior de 256 no viene de la base de datos —la contraseña no se almacena en claro—
-sino del contrato, y existe para acotar el costo de la derivación PBKDF2. Un límite ausente aquí
-es una vía de agotamiento de CPU: contraseñas de un megabyte obligan al servidor a derivar sobre
-todas ellas.
+**Procedencia del límite superior, y una advertencia.** El 256 no viene de la base de datos —la
+contraseña no se almacena en claro, solo su derivación— ni de la especificación, que sobre esto
+solo dice *"longitud extrema: debe validarse y almacenarse sin corrupción ni truncamiento"*. Viene
+del contrato de `POST /api/auth/login`, y **no tiene ninguna decisión registrada que lo justifique**
+en `research.md`. Es el único límite de este documento sin respaldo verificable: el 100 del nombre
+de usuario sale de `NOMBRE_USUARIO nvarchar(100)`, el 45 de `IP_ORIGEN nvarchar(45)`, los tiempos
+de los requisitos, y este de una elección no documentada.
+
+La razón defendible para tener un tope es no aceptar entrada sin cota en un endpoint anónimo, y el
+valor es razonable frente a la guía de OWASP, que pide admitir al menos 64 caracteres y permite
+rechazar por encima de 128. Lo que **no** es una razón válida es acotar el costo de la derivación:
+en PBKDF2-HMAC-SHA256 la contraseña se usa como clave HMAC y, si excede el tamaño de bloque, se
+comprime a 32 bytes con un único hash antes de que corran las 600.000 iteraciones sobre esa clave
+de tamaño fijo. Una contraseña de un megabyte añade un hash, no seiscientos mil. Ese argumento
+aplicaría a bcrypt o a un esquema que reinyecte la contraseña completa en cada iteración, no al
+que eligió la decisión D-01.
+
+**Pendiente:** que el contrato registre el porqué del 256, o que se alinee explícitamente con el
+mínimo de 64 que exige OWASP. Mientras no exista ese registro, los dos escenarios de borde prueban
+un número que nadie puede defender si se cuestiona en una revisión.
 
 ## Longitud de `IP_ORIGEN` — límite 45
 

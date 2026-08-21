@@ -1,0 +1,21 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/1. Core/">
+    <Project Path="src/1. Core/Optica.Application/Optica.Application.csproj" />
+    <Project Path="src/1. Core/Optica.Domain/Optica.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/2. Infrastructure/">
+    <Project Path="src/2. Infrastructure/Optica.Infrastructure/Optica.Infrastructure.csproj" />
+    <Project Path="src/2. Infrastructure/Optica.Shared/Optica.Shared.csproj" />
+  </Folder>
+  <Folder Name="/src/3. Presentation/">
+    <Project Path="src/3. Presentation/Optica.Web.Client/Optica.Web.Client.csproj" />
+    <Project Path="src/3. Presentation/Optica.Web/Optica.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Optica.Application.Tests/Optica.Application.Tests.csproj" />
+    <Project Path="tests/Optica.Architecture.Tests/Optica.Architecture.Tests.csproj" />
+    <Project Path="tests/Optica.Domain.Tests/Optica.Domain.Tests.csproj" />
+    <Project Path="tests/Optica.Integration.Tests/Optica.Integration.Tests.csproj" />
+  </Folder>
+</Solution>

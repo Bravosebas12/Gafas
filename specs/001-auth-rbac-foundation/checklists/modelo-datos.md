@@ -9,7 +9,7 @@ Referencia normativa: principio X (Modelo de Datos como Fuente de Verdad) de [co
 
 ## Consistencia entre requisitos y esquema
 
-- [ ] CHK001 ¿Es consistente FR-029, que exige vincular los roles al **perfil de empleado**, con el esquema, donde la asignación de roles cuelga del usuario? El requisito y la estructura no dicen lo mismo. [Conflict, Spec §FR-029]
+- [x] CHK001 ¿Es consistente FR-029 con el esquema? [Conflict, Spec §FR-029] — **RESUELTO 2026-08-20**: se corrigió el requisito para alinearlo con el esquema, sin cambio de esquema. La compuerta G10 sigue en verde.
 - [ ] CHK002 ¿Está declarado que el caso borde del "empleado dado de baja" **no es representable** en el esquema, dado que la tabla de empleados no tiene columna de baja lógica? [Gap, Spec §Edge Cases]
 - [ ] CHK003 ¿Es consistente el requisito de baja lógica del principio VII con el esquema para todas las entidades que esta feature toca, o solo para el usuario? [Consistency, Constitución §VII]
 - [ ] CHK004 ¿Concuerda la longitud máxima del nombre de usuario declarada en los contratos con la que admite el esquema, y está definido qué debe ocurrir al excederla? [Consistency, Spec §FR-001]

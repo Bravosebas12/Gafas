@@ -17,8 +17,8 @@
 
 ## Completitud de los requisitos de sesión
 
-- [ ] CHK006 ¿Está especificado si la rotación de la credencial de renovación **reinicia** el plazo de 8 horas o si preserva el inicio original de la sesión? Sin esa definición, una cadena de rotaciones puede extender la sesión de forma indefinida. [Ambiguity, Spec §FR-009, §FR-011]
-- [ ] CHK007 ¿Existe un requisito de duración máxima absoluta de sesión, independiente de la renovación? [Gap]
+- [x] CHK006 ¿Está especificado si la rotación de la credencial de renovación **reinicia** el plazo de 8 horas o si preserva el inicio original de la sesión? [Ambiguity, Spec §FR-009, §FR-011] — **RESUELTO 2026-08-20**: se añadió FR-009a. El vencimiento es absoluto desde la autenticación y la rotación lo hereda. Consecuencia aceptada: un turno de más de 8 horas exige autenticarse dos veces.
+- [x] CHK007 ¿Existe un requisito de duración máxima absoluta de sesión, independiente de la renovación? [Gap] — **RESUELTO 2026-08-20**: FR-009a lo fija en 8 horas desde la autenticación.
 - [ ] CHK008 ¿Está definido cuántas sesiones concurrentes puede tener un mismo usuario, y si un ingreso desde un dispositivo nuevo debe invalidar los anteriores? [Gap, Spec §US2]
 - [ ] CHK009 ¿Están especificados en la especificación los requisitos de transporte de las credenciales, o esa decisión vive solo en el plan? Si vive solo en el plan, ¿es una delegación deliberada? [Traceability, Spec §FR-007]
 - [ ] CHK010 ¿Se exige de forma explícita que la aplicación se sirva sobre canal cifrado? Ningún requisito lo menciona, y varias decisiones de sesión lo presuponen. [Gap]
@@ -26,7 +26,7 @@
 
 ## Completitud de los requisitos de resistencia a ataques
 
-- [ ] CHK012 ¿Existe algún requisito de limitación por origen de la petición, además del bloqueo por cuenta? Un ataque repartido entre muchas cuentas no dispara ningún bloqueo. [Gap, Spec §FR-017]
+- [x] CHK012 ¿Existe algún requisito de limitación por origen de la petición, además del bloqueo por cuenta? [Gap, Spec §FR-017] — **RESUELTO 2026-08-20**: queda **fuera de alcance** de forma explícita, con el riesgo aceptado por escrito en Assumptions. DEBE revisarse antes de exponer la aplicación a internet.
 - [ ] CHK013 ¿Está especificado el comportamiento requerido ante un volumen anómalo de intentos fallidos contra cuentas inexistentes? [Coverage, Spec §FR-022]
 - [ ] CHK014 ¿Se define un requisito de detección o notificación ante bloqueos repetidos, o el bloqueo silencioso agota lo exigido? [Gap, Spec §FR-021]
 - [ ] CHK015 ¿Está definido si el bloqueo debe poder levantarse de forma administrativa antes de los quince minutos, o si el vencimiento automático es la única vía? [Ambiguity, Spec §FR-018]
@@ -40,7 +40,7 @@
 
 ## Consistencia entre requisitos
 
-- [ ] CHK020 ¿Es consistente FR-029, que exige vincular los roles al **perfil de empleado**, con el modelo de datos, donde la asignación de roles cuelga del **usuario** y no del empleado? [Conflict, Spec §FR-029]
+- [x] CHK020 ¿Es consistente FR-029 con el modelo de datos? [Conflict, Spec §FR-029] — **RESUELTO 2026-08-20**: se corrigió FR-029. Los roles se asignan a la cuenta de usuario y son atribuibles al empleado a través de ella, sin cambio de esquema.
 - [ ] CHK021 ¿Es consistente la ventana de exposición de FR-032 con el requisito de menor privilegio del principio VI, y está registrada la aceptación explícita de esos quince minutos? [Consistency, Spec §FR-032]
 - [ ] CHK022 ¿Concuerdan FR-031, que permite ingresar sin roles, y FR-026, que exige autorizar toda operación, sobre qué puede hacer exactamente un usuario sin roles tras autenticarse? [Consistency, Spec §FR-031]
 - [ ] CHK023 ¿Están alineados el alcance de esta feature y el de RF-CFG-02 sobre quién es responsable de la política de complejidad, sin dejar el requisito huérfano entre ambas? [Consistency, Spec §Assumptions]

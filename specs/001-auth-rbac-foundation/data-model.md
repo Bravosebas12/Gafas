@@ -138,7 +138,7 @@ compuesta ya impide la asignación duplicada, sin validación adicional en la ap
 | Id | `ID` | |
 | UsuarioId | `USUARIO_ID` | Clave foránea a `Usuarios` |
 | HashDelToken | `TOKEN_HASH` | `varbinary(256)`. Se persiste **solo el hash** (FR-010, SC-007) |
-| VenceEn | `EXPIRES_AT` | UTC. Emisión + 8 horas (FR-009) |
+| VenceEn | `EXPIRES_AT` | UTC. **Autenticación** + 8 horas (FR-009). En una rotación, la fila nueva **copia** este valor de la consumida; nunca se recalcula (FR-009a) |
 | RevocadaEn | `REVOKED_AT` | Nulo mientras está vigente |
 
 El valor en claro es aleatorio de 256 bits y **solo existe en la cookie del navegador**. Al no ser
@@ -149,6 +149,10 @@ contraseña, porque no hay espacio de búsqueda que un atacante pueda recorrer.
 
 - **R-C1** (FR-011): cada uso rota la credencial. La fila consumida recibe `REVOKED_AT` y se
   inserta una nueva, todo en la misma transacción.
+- **R-C1a** (FR-009a): la fila nueva **hereda** el `EXPIRES_AT` de la consumida. Es lo que hace que
+  la sesión tenga un techo absoluto de 8 horas: recalcular el vencimiento en cada rotación
+  permitiría extenderla de forma indefinida. Que el esquema tenga `EXPIRES_AT` y no una columna de
+  inicio de sesión es suficiente, porque el valor heredado ya representa el techo.
 - **R-C2** (FR-012): se rechaza la renovación si el hash no existe, si `EXPIRES_AT` ya pasó, si
   `REVOKED_AT` no es nulo, o si `USUARIO_ID` no corresponde al portador.
 - **R-C3** (FR-013): encontrar el hash **con `REVOKED_AT` poblado** significa reutilización de una

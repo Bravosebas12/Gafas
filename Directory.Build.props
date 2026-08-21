@@ -1,0 +1,45 @@
+<Project>
+
+  <!--
+    Propiedades comunes a toda la solución.
+    Materializa el principio I (código limpio, sin advertencias) y el principio IV
+    (cobertura verificada) de .specify/memory/constitution.md.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework Condition="'$(TargetFramework)' == '' and '$(TargetFrameworks)' == ''">net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <InvariantGlobalization>false</InvariantGlobalization>
+  </PropertyGroup>
+
+  <!--
+    El principio I exige ausencia de advertencias del compilador y del analizador, y el
+    "Definition of Done" lo verifica. Tratarlas como errores es la única forma de que la
+    regla no se degrade con el tiempo.
+  -->
+  <PropertyGroup>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- CS1591: no se exige comentario XML en cada miembro público. La sección Documentación
+         de la constitución pide documentar las APIs públicas, no todo miembro interno. -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <!--
+    Umbrales de cobertura del principio IV (NO NEGOCIABLE). El umbral por capa crítica
+    (>=90% en Domain y Application) se aplica en el Directory.Build.props de tests/,
+    porque coverlet mide por proyecto de prueba.
+  -->
+  <PropertyGroup>
+    <CoverletOutputFormat>cobertura</CoverletOutputFormat>
+    <CoverageThresholdGlobal>85</CoverageThresholdGlobal>
+    <CoverageThresholdCritico>90</CoverageThresholdCritico>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,24 @@
+<Project>
+
+  <!-- Hereda las reglas de la raíz y añade lo propio de los proyectos de prueba. -->
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!--
+      CA1707 prohíbe guiones bajos en nombres de miembro. El principio IV de la constitución
+      exige que "las pruebas DEBEN nombrarse por el comportamiento esperado", y la convención
+      de xUnit para eso son nombres con guion bajo, del estilo
+      Domain_no_conoce_el_ORM. La regla del analizador está pensada para APIs públicas
+      consumidas por terceros, no para nombres de prueba que se leen como una frase.
+
+      Se suprime solo en los proyectos de prueba. En el código de producción sigue activa.
+    -->
+    <NoWarn>$(NoWarn);CA1707</NoWarn>
+  </PropertyGroup>
+
+</Project>

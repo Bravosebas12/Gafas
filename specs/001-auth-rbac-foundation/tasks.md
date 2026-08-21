@@ -39,18 +39,18 @@ tests/Optica.Application.Tests/       tests/Optica.Architecture.Tests/
 
 **Purpose**: crear la solución y los diez proyectos con las referencias exactas del principio II.
 
-- [ ] T001 Crear `OpticaSolution.sln` en la raíz del repositorio con las carpetas de solución `1. Core`, `2. Infrastructure`, `3. Presentation` y `tests`
-- [ ] T002 Crear `Directory.Build.props` en la raíz con `TreatWarningsAsErrors`, `EnableNETAnalyzers`, `AnalysisLevel latest`, `Nullable enable` y `LangVersion` de C# 14
-- [ ] T003 [P] Crear proyecto de biblioteca `src/1. Core/Optica.Domain/Optica.Domain.csproj` sin ninguna referencia de paquete
-- [ ] T004 [P] Crear proyecto `src/1. Core/Optica.Application/Optica.Application.csproj` con MediatR y FluentValidation
-- [ ] T005 [P] Crear proyecto `src/2. Infrastructure/Optica.Infrastructure/Optica.Infrastructure.csproj` con EF Core 10 y el proveedor de SQL Server
-- [ ] T006 [P] Crear proyecto `src/2. Infrastructure/Optica.Shared/Optica.Shared.csproj` sin dependencias exclusivas de servidor, verificando que compila para WebAssembly (decisión D-10)
-- [ ] T007 Crear la Blazor Web App `src/3. Presentation/Optica.Web/Optica.Web.csproj` con MudBlazor y modo de render por componente
-- [ ] T008 Crear `src/3. Presentation/Optica.Web.Client/Optica.Web.Client.csproj` que referencie únicamente `Optica.Shared`; queda sin componentes en esta feature y existe para forzar la compilación a WebAssembly
-- [ ] T009 Declarar las referencias entre proyectos exactamente según la tabla del principio II en `.specify/memory/constitution.md`, sin ninguna referencia adicional
-- [ ] T010 [P] Crear los cuatro proyectos de prueba con xUnit y coverlet: `tests/Optica.Domain.Tests/`, `tests/Optica.Application.Tests/`, `tests/Optica.Integration.Tests/`, `tests/Optica.Architecture.Tests/`
-- [ ] T011 [P] Configurar los umbrales de cobertura en `Directory.Build.props` de modo que el proceso falle por debajo de 85% global y 90% en dominio y aplicación (compuerta G3)
-- [ ] T012 [P] Documentar las claves de configuración esperadas en `src/3. Presentation/Optica.Web/appsettings.json` **sin ningún valor secreto**, y añadir `.gitignore` para artefactos de compilación
+- [x] T001 Crear `OpticaSolution.sln` en la raíz del repositorio con las carpetas de solución `1. Core`, `2. Infrastructure`, `3. Presentation` y `tests`
+- [x] T002 Crear `Directory.Build.props` en la raíz con `TreatWarningsAsErrors`, `EnableNETAnalyzers`, `AnalysisLevel latest`, `Nullable enable` y `LangVersion` de C# 14
+- [x] T003 [P] Crear proyecto de biblioteca `src/1. Core/Optica.Domain/Optica.Domain.csproj` sin ninguna referencia de paquete
+- [x] T004 [P] Crear proyecto `src/1. Core/Optica.Application/Optica.Application.csproj` con MediatR y FluentValidation
+- [x] T005 [P] Crear proyecto `src/2. Infrastructure/Optica.Infrastructure/Optica.Infrastructure.csproj` con EF Core 10 y el proveedor de SQL Server
+- [x] T006 [P] Crear proyecto `src/2. Infrastructure/Optica.Shared/Optica.Shared.csproj` sin dependencias exclusivas de servidor, verificando que compila para WebAssembly (decisión D-10)
+- [x] T007 Crear la Blazor Web App `src/3. Presentation/Optica.Web/Optica.Web.csproj` con MudBlazor y modo de render por componente
+- [x] T008 Crear `src/3. Presentation/Optica.Web.Client/Optica.Web.Client.csproj` que referencie únicamente `Optica.Shared`; queda sin componentes en esta feature y existe para forzar la compilación a WebAssembly
+- [x] T009 Declarar las referencias entre proyectos exactamente según la tabla del principio II en `.specify/memory/constitution.md`, sin ninguna referencia adicional
+- [x] T010 [P] Crear los cuatro proyectos de prueba con xUnit y coverlet: `tests/Optica.Domain.Tests/`, `tests/Optica.Application.Tests/`, `tests/Optica.Integration.Tests/`, `tests/Optica.Architecture.Tests/`
+- [x] T011 [P] Configurar los umbrales de cobertura en `Directory.Build.props` de modo que el proceso falle por debajo de 85% global y 90% en dominio y aplicación (compuerta G3)
+- [x] T012 [P] Documentar las claves de configuración esperadas en `src/3. Presentation/Optica.Web/appsettings.json` **sin ningún valor secreto**, y añadir `.gitignore` para artefactos de compilación
 
 ---
 
@@ -60,8 +60,8 @@ tests/Optica.Application.Tests/       tests/Optica.Architecture.Tests/
 
 **⚠️ CRÍTICO**: ninguna historia de usuario puede empezar hasta que esta fase esté completa.
 
-- [ ] T013 Implementar la prueba de arquitectura en `tests/Optica.Architecture.Tests/ReglaDeDependenciasTests.cs` con `NetArchTest.Rules`, un caso por fila de la tabla del principio II (compuerta G1)
-- [ ] T014 Añadir a `tests/Optica.Architecture.Tests/DominioAisladoTests.cs` las pruebas que prohíben en `Optica.Domain` los tipos de EF Core, `IConfiguration`, `HttpContext` y `DateTime`
+- [x] T013 Implementar la prueba de arquitectura en `tests/Optica.Architecture.Tests/ReglaDeDependenciasTests.cs` con `NetArchTest.Rules`, un caso por fila de la tabla del principio II (compuerta G1)
+- [x] T014 Añadir a `tests/Optica.Architecture.Tests/DominioAisladoTests.cs` las pruebas que prohíben en `Optica.Domain` los tipos de EF Core, `IConfiguration`, `HttpContext` y `DateTime`
 - [ ] T015 [P] Crear los tipos base del dominio en `src/1. Core/Optica.Domain/Comun/`: resultado de operación, excepciones de dominio y tipos de valor, todos inmutables (principio V)
 - [ ] T016 [P] Declarar las abstracciones de la capa de aplicación en `src/1. Core/Optica.Application/Abstracciones/`: repositorios, `IHasheadorDeContrasena`, `IEmisorDeToken` y unidad de trabajo
 - [ ] T017 Registrar MediatR y los comportamientos de canal en `src/1. Core/Optica.Application/Comportamientos/`: validación previa al handler, log con identificador de correlación y transacción
@@ -122,7 +122,7 @@ tests/Optica.Application.Tests/       tests/Optica.Architecture.Tests/
 
 ### Tests for User Story 2 (OBLIGATORIAS)
 
-- [ ] T042 [P] [US2] Pruebas de los escenarios 2.2 y 2.3 con `FakeTimeProvider` en `tests/Optica.Application.Tests/Autenticacion/RenovarSesionHandlerTests.cs`, sin esperas reales
+- [ ] T042 [P] [US2] Pruebas de los escenarios 2.2 y 2.3 con `FakeTimeProvider` en `tests/Optica.Application.Tests/Autenticacion/RenovarSesionHandlerTests.cs`, sin esperas reales, **incluida** una prueba de que una cadena de rotaciones no extiende la sesión más allá de las 8 horas (FR-009a)
 - [ ] T043 [P] [US2] Prueba del escenario 2.7 en `tests/Optica.Application.Tests/Autenticacion/ClaimsDelTokenTests.cs`, que falla si aparece cualquier claim no previsto
 - [ ] T044 [P] [US2] Prueba del escenario 2.1 en `tests/Optica.Integration.Tests/Autenticacion/CookiesDeSesionTests.cs`, verificando `HttpOnly`, `Secure` y `SameSite=Strict` en ambas cookies
 - [ ] T045 [P] [US2] Prueba del escenario 2.4 en `tests/Optica.Integration.Tests/Autenticacion/ReutilizacionDeCredencialTests.cs`: reutilizar una credencial rotada revoca toda la cadena del usuario
@@ -134,11 +134,11 @@ tests/Optica.Application.Tests/       tests/Optica.Architecture.Tests/
 
 - [ ] T049 [P] [US2] Crear la entidad `CredencialDeRenovacion` en `src/1. Core/Optica.Domain/Autenticacion/`, con las reglas R-C1 a R-C5
 - [ ] T050 [US2] Implementar el emisor y el validador del token en `src/2. Infrastructure/Optica.Infrastructure/Seguridad/EmisorDeTokenJwt.cs`, con vencimiento de 15 minutos y solo los claims de FR-015
-- [ ] T051 [US2] Implementar `RepositorioDeCredenciales` con la rotación atómica condicionada a `WHERE REVOKED_AT IS NULL` y comprobación de filas afectadas (decisión D-05, regla R-C1)
+- [ ] T051 [US2] Implementar `RepositorioDeCredenciales` con la rotación atómica condicionada a `WHERE REVOKED_AT IS NULL` y comprobación de filas afectadas (decisión D-05, regla R-C1). La fila nueva DEBE **heredar** el `EXPIRES_AT` de la consumida, nunca recalcularlo (FR-009a, regla R-C1a)
 - [ ] T052 [US2] Implementar la detección de reutilización que revoca todas las credenciales activas del usuario cuando el hash presentado tiene `REVOKED_AT` poblado (FR-013, regla R-C3), auditada como `REVOCACION_CADENA`
 - [ ] T053 [US2] Implementar la escritura y lectura de las cookies `optica_at` y `optica_rt` en `src/3. Presentation/Optica.Web/Autenticacion/CookiesDeSesion.cs`, con `HttpOnly`, `Secure` y `SameSite=Strict` (decisión D-04)
 - [ ] T054 [US2] Configurar la autenticación por token leyendo el JWT desde la cookie `optica_at`, de modo que el render en servidor y las islas WebAssembly compartan la sesión
-- [ ] T055 [P] [US2] Implementar el comando de renovación en `src/1. Core/Optica.Application/Autenticacion/Comandos/RenovarSesion/`, con vencimiento de 8 horas para la credencial (FR-009)
+- [ ] T055 [P] [US2] Implementar el comando de renovación en `src/1. Core/Optica.Application/Autenticacion/Comandos/RenovarSesion/`, con techo absoluto de 8 horas desde la autenticación y herencia del vencimiento en cada rotación (FR-009, FR-009a)
 - [ ] T056 [P] [US2] Implementar el comando de cierre de sesión en `src/1. Core/Optica.Application/Autenticacion/Comandos/CerrarSesion/`, idempotente y que revoca las credenciales activas (FR-014)
 - [ ] T057 [P] [US2] Implementar la consulta de sesión actual en `src/1. Core/Optica.Application/Autenticacion/Consultas/ObtenerSesionActual/`, leyendo los roles del token y no de la base (FR-032)
 - [ ] T058 [US2] Exponer `POST /api/auth/refresh`, `POST /api/auth/logout` y `GET /api/auth/session` en `AutenticacionEndpoints.cs`, según los contratos
@@ -189,7 +189,7 @@ tests/Optica.Application.Tests/       tests/Optica.Architecture.Tests/
 
 ### Implementation for User Story 4
 
-- [ ] T074 [P] [US4] Crear las entidades `Rol` y `UsuarioRol` en `src/1. Core/Optica.Domain/Usuarios/`, con el conjunto cerrado `Administrador`, `Vendedor` y `Optometra`. **El código va sin tilde**; la tilde solo aparece en el nombre visible
+- [ ] T074 [P] [US4] Crear las entidades `Rol` y `UsuarioRol` en `src/1. Core/Optica.Domain/Usuarios/`, con el conjunto cerrado `Administrador`, `Vendedor` y `Optometra`. Los roles se asignan a la **cuenta de usuario**, no al perfil de empleado (FR-029). **El código va sin tilde**; la tilde solo aparece en el nombre visible
 - [ ] T075 [US4] Incluir los roles como claims en el token emitido, usando el código y no el nombre (FR-025)
 - [ ] T076 [US4] Definir las políticas `SoloAdministrador` y `Autenticado` en `src/3. Presentation/Optica.Web/Autenticacion/PoliticasDeAutorizacion.cs`, autorizando si **cualquiera** de los roles del usuario satisface la política (FR-025, FR-031)
 - [ ] T077 [P] [US4] Implementar la consulta de roles en `src/1. Core/Optica.Application/Roles/Consultas/ListarRoles/` y exponer `GET /api/roles`. **No existe** `POST /api/roles` y no debe existir (FR-024)
