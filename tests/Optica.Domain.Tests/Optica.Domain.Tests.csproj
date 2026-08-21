@@ -22,4 +22,16 @@
     <ProjectReference Include="..\..\src\1. Core\Optica.Domain\Optica.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!--
+      PRUEBA ESCRITA ANTES DE SU IMPLEMENTACION (principio IV, pruebas primero).
+      Define la superficie que debe implementar la tarea T033.
+      Se excluye de la compilacion unicamente para no romper la compilacion de la
+      solucion mientras el tipo no existe, porque hay trabajo en paralelo sobre la
+      misma rama. AL IMPLEMENTAR T033, BORRAR ESTE ItemGroup COMPLETO: la prueba
+      debe pasar a rojo y despues a verde.
+    -->
+    <Compile Remove="Usuarios/UsuarioTests.cs" />
+  </ItemGroup>
+
 </Project>

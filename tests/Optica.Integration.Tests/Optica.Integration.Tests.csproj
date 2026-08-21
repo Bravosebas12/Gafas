@@ -26,4 +26,16 @@
     <ProjectReference Include="..\..\src\2. Infrastructure\Optica.Shared\Optica.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!--
+      PRUEBA ESCRITA ANTES DE SU IMPLEMENTACION (principio IV, pruebas primero).
+      Define la superficie que debe implementar la tarea T034.
+      Se excluye de la compilacion unicamente para no romper la compilacion de la
+      solucion mientras el tipo no existe, porque hay trabajo en paralelo sobre la
+      misma rama. AL IMPLEMENTAR T034, BORRAR ESTE ItemGroup COMPLETO: la prueba
+      debe pasar a rojo y despues a verde.
+    -->
+    <Compile Remove="Seguridad/HasheoDeContrasenaTests.cs" />
+  </ItemGroup>
+
 </Project>

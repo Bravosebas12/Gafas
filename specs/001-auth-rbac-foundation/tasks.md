@@ -89,9 +89,9 @@ tests/Optica.Application.Tests/       tests/Optica.Architecture.Tests/
 
 > Escribir estas pruebas primero y comprobar que fallan antes de implementar.
 
-- [ ] T027 [P] [US1] Pruebas de las reglas R-U1 a R-U5 del usuario en `tests/Optica.Domain.Tests/Usuarios/UsuarioTests.cs`
-- [ ] T028 [P] [US1] Pruebas del handler de ingreso para contraseña incorrecta y usuario desactivado, escenarios 1.2 y 1.4, en `tests/Optica.Application.Tests/Autenticacion/IniciarSesionHandlerTests.cs`
-- [ ] T029 [P] [US1] Prueba de ida y vuelta del hash con caracteres no latinos, espacios y longitud extrema en `tests/Optica.Domain.Tests/Seguridad/HasheoDeContrasenaTests.cs`
+- [x] T027 [P] [US1] Pruebas de las reglas R-U1 a R-U5 del usuario en `tests/Optica.Domain.Tests/Usuarios/UsuarioTests.cs`
+- [x] T028 [P] [US1] Pruebas del handler de ingreso para contraseña incorrecta y usuario desactivado, escenarios 1.2 y 1.4, en `tests/Optica.Application.Tests/Autenticacion/IniciarSesionHandlerTests.cs`
+- [x] T029 [P] [US1] Prueba de ida y vuelta del hash con caracteres no latinos, espacios y longitud extrema. **Reubicada** a `tests/Optica.Integration.Tests/Seguridad/HasheoDeContrasenaTests.cs`: el hasheador se implementa en `Optica.Infrastructure` (T034) y `Optica.Domain.Tests` solo referencia `Optica.Domain`, de modo que la ubicación original habría exigido una referencia que viola el principio II y la compuerta G1. La ubicación idónea sería un proyecto `Optica.Infrastructure.Tests` propio
 - [ ] T030 [P] [US1] Pruebas de integración de los escenarios 1.1 y 1.6 en `tests/Optica.Integration.Tests/Autenticacion/IngresoTests.cs`, incluida la verificación de la fila en `LoginAttempts`
 - [ ] T031 [P] [US1] Prueba de igualación de tiempos del escenario 1.3 en `tests/Optica.Integration.Tests/Autenticacion/EnumeracionDeCuentasTests.cs`, que comprueba SC-004 con diferencia inferior a 100 ms
 - [ ] T032 [P] [US1] Prueba del escenario 1.5 en `tests/Optica.Integration.Tests/Configuracion/ProveedoresExternosTests.cs`: arrancar el host con un proveedor externo declarado debe lanzar excepción
