@@ -368,3 +368,75 @@ del usuario. Reutiliza el andamiaje de D-11 y T026.
 
 **Diagnóstico de fallos**: conservar captura de pantalla, video y traza de Playwright en cada fallo.
 Sin ellos, un fallo en integración continua es irreproducible.
+
+---
+
+## D-08a — Algoritmo de firma del token y rotación de clave
+
+**Decisión**: **HS256** con clave simétrica única, custodiada según D-08. **Sin rotación
+programada** en esta feature.
+
+**Rationale**: quien firma el token y quien lo valida son el mismo proceso, `Optica.Web`. La
+asimetría de RS256 existe para que un tercero pueda validar sin poder firmar, y aquí no hay
+tercero: no se expone el token a otro servicio ni a otra aplicación. HS256 con una clave de al
+menos 32 bytes, que T023 ya valida en el arranque, es la opción correcta para este alcance.
+
+**Alternativas descartadas**: RS256, que añade gestión de par de claves y publicación de clave
+pública sin ningún consumidor que las necesite. Se reconsidera el día que un segundo servicio deba
+validar tokens emitidos por este.
+
+**Hueco que esta decisión NO cierra, y queda registrado**: la rotación de clave y la invalidación
+masiva de sesiones ante una fuga del secreto de firma. Con clave única y sin rotación, la única
+respuesta a una fuga es cambiar la clave, lo que invalida **todas** las sesiones de golpe. Eso es
+aceptable como respuesta de emergencia para una sede con diez usuarios, pero no está especificado
+como procedimiento. Los ítems correspondientes de `checklists/security.md` quedan abiertos a
+propósito y DEBEN resolverse antes de exponer la aplicación a internet.
+
+---
+
+## D-14 — Qué eventos van a la tabla de auditoría
+
+**Decisión**: exactamente cuatro, según FR-038: bloqueo de cuenta, cambio de roles, cierre de
+sesión y revocación en cascada de credenciales por reutilización. La renovación de sesión **no**.
+
+**Rationale**: el criterio es el valor forense por fila, no la importancia del evento. La
+renovación ocurre cada 15 minutos por usuario, unas 30 veces por jornada y unas 300 al mes con diez
+usuarios, y cada fila diría lo mismo: la sesión siguió viva. Eso ya lo dice el registro
+estructurado de FR-037, que sí la cubre, y la fila de `RefreshTokens` con su marca de rotación.
+Llevarla a la tabla de auditoría multiplicaría su volumen sin añadir una pregunta que se pueda
+responder solo con ella.
+
+Los otros tres sí entran, y dos de ellos no tenían requisito antes de este análisis:
+
+- **Cierre de sesión**: evento discreto y poco frecuente. Sin él no se puede reconstruir cuándo
+  terminó una sesión, que es la mitad de la pregunta "quién estaba dentro y hasta cuándo".
+- **Revocación en cascada**: es el indicio más fuerte de compromiso que el sistema sabe detectar.
+  Una credencial ya rotada que reaparece significa que alguien más la tuvo. No registrarlo era el
+  hueco más serio que el recorrido de checklists encontró.
+- **Bloqueo y cambio de roles**: ya exigidos por FR-021 y FR-028.
+
+**Consecuencia para la implementación**: el interceptor de auditoría de T019 escribe estos cuatro y
+ninguno más. La lista es cerrada y verificable, lo que convierte la compuerta G7 en algo auditable
+en lugar de una deducción requisito por requisito.
+
+---
+
+## D-15 — Retención y purga de las trazas que crecen (FR-041)
+
+**Decisión**: mecanismo de purga con dos políticas separadas. Intentos de ingreso: **un año**.
+Credenciales de renovación revocadas o vencidas: **treinta días**. Los registros de auditoría
+**no se purgan nunca**.
+
+**Rationale**: las tres tablas crecen a ritmos muy distintos y por razones distintas.
+`LoginAttempts` acumula una fila por intento, incluidos los de un atacante, así que su cota superior
+no depende del uso legítimo. `RefreshTokens` acumula una fila por rotación: unas 30 por usuario y
+jornada, y solo la última de cada cadena tiene valor operativo. `AUDITORIA` es de solo inserción por
+el principio VII y su volumen es bajo por diseño, ahora que D-14 dejó fuera la renovación.
+
+**Naturaleza de los valores**: son valores por omisión defendibles para una traza de seguridad, no
+un requisito del negocio. Están en Assumptions marcados como confirmables y son revisables sin
+impacto técnico: nada depende de ellos salvo el propio proceso de purga.
+
+**Alternativa descartada**: no purgar nada y dejarlo como deuda. Es lo que había, y el recorrido de
+checklists lo señaló en tres ítems distintos de dos checklists. Una tabla que crece sin cota
+termina siendo un problema de producción que nadie previó, y el costo de preverlo hoy es una tarea.

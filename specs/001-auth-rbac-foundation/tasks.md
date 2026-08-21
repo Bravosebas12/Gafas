@@ -66,12 +66,12 @@ tests/Optica.Application.Tests/       tests/Optica.Architecture.Tests/
 - [ ] T016 [P] Declarar las abstracciones de la capa de aplicación en `src/1. Core/Optica.Application/Abstracciones/`: repositorios, `IHasheadorDeContrasena`, `IEmisorDeToken` y unidad de trabajo
 - [ ] T017 Registrar MediatR y los comportamientos de canal en `src/1. Core/Optica.Application/Comportamientos/`: validación previa al handler, log con identificador de correlación y transacción
 - [ ] T018 Crear `src/2. Infrastructure/Optica.Infrastructure/Persistencia/OpticaDbContext.cs` **sin migraciones**, con las configuraciones mapeadas a las tablas existentes de `ADMINISTRACION_USUARIOS` y `AUDITORIA` (decisión D-03, principio X)
-- [ ] T019 Implementar el interceptor de auditoría en `src/2. Infrastructure/Optica.Infrastructure/Persistencia/Interceptores/AuditoriaInterceptor.cs`, que escribe en `AUDITORIA.LogUsuarios` dentro de la misma transacción y **excluye de forma explícita** `PASSWORD_HASH`, `PASSWORD_SALT` y `TOKEN_HASH` (compuerta G7, regla R-A3)
+- [ ] T019 Implementar el interceptor de auditoría en `src/2. Infrastructure/Optica.Infrastructure/Persistencia/Interceptores/AuditoriaInterceptor.cs`, que escribe en `AUDITORIA.LogUsuarios` dentro de la misma transacción y **excluye de forma explícita** `PASSWORD_HASH`, `PASSWORD_SALT` y `TOKEN_HASH` (compuerta G7, regla R-A3). Escribe **exactamente los cuatro eventos de FR-038** y ninguno más: bloqueo de cuenta, cambio de roles, cierre de sesión y revocación en cascada por reutilización de credencial. La renovación de sesión NO va a la tabla de auditoría, solo al registro estructurado (decisión D-14)
 - [ ] T020 Implementar el interceptor que puebla `USUARIO_CREACION`, `FECHA_CREACION`, `USUARIO_ACTUALIZACION` y `FECHA_ACTUALIZACION` desde `TimeProvider` y el usuario de la petición (principio VII)
 - [ ] T021 [P] Registrar `TimeProvider` en la inyección de dependencias y prohibir `DateTime.Now` y `DateTime.UtcNow` mediante una regla del analizador (decisión D-07)
 - [ ] T022 Implementar el validador de configuración en `src/2. Infrastructure/Optica.Infrastructure/Configuracion/ValidadorDeProveedoresExternos.cs`, que **falla el arranque** ante cualquier proveedor de identidad externo declarado (FR-002, compuerta G5)
-- [ ] T023 Validar en el arranque que la clave de firma del token existe y mide al menos 32 bytes, fallando de forma explícita si no (decisión D-08)
-- [ ] T024 [P] Configurar el log estructurado con identificador de correlación por petición y el filtro que impide registrar contraseñas, tokens y credenciales de renovación (compuerta G8)
+- [ ] T023 Validar en el arranque que la clave de firma del token existe y mide al menos 32 bytes, fallando de forma explícita si no (decisión D-08). El algoritmo de firma es **HS256** con clave simétrica única, sin rotación programada en esta feature (decisión D-08a)
+- [ ] T024 [P] Configurar el log estructurado con identificador de correlación por petición y el filtro que impide registrar contraseñas, tokens y credenciales de renovación (compuerta G8). Solo registro estructurado: las métricas de FR-040 son T095, deliberadamente separadas
 - [ ] T025 [P] Implementar el middleware de errores que traduce fallos a `application/problem+json` con los códigos de los contratos
 - [ ] T026 Crear el andamiaje de pruebas de integración en `tests/Optica.Integration.Tests/Infraestructura/`: fábrica de host, base de datos de pruebas y limpieza de estado con `Respawn` (decisión D-11)
 
@@ -106,7 +106,7 @@ tests/Optica.Application.Tests/       tests/Optica.Architecture.Tests/
 - [ ] T038 [US1] Implementar el registro de todo intento en `LoginAttempts`, con `USUARIO_ID` nulo cuando la cuenta no existe (FR-006, FR-022, reglas R-I1 a R-I4)
 - [ ] T039 [US1] Exponer `POST /api/auth/login` en `src/3. Presentation/Optica.Web/Endpoints/AutenticacionEndpoints.cs`, según [contracts/auth-endpoints.md](./contracts/auth-endpoints.md), limitado a recibir, despachar y mapear (principio III)
 - [ ] T040 [P] [US1] Mapear los tokens de color y tipografía de `docs/PLAN-MAQUETACION.md` al tema de MudBlazor en `src/3. Presentation/Optica.Web/Componentes/TemaOptica.cs`, sin valores literales (principio IX)
-- [ ] T041 [US1] Implementar la pantalla de ingreso en `src/3. Presentation/Optica.Web/Componentes/Paginas/Login.razor` con render en servidor, los **cuatro estados** de la tabla del plan, foco inicial en el campo de usuario, recorrido completo por teclado y mensaje de error con ícono además del color (compuerta G9). El campo de contraseña declara el **tope de 12 caracteres** de FR-003a en el propio control, de modo que el formulario no permita escribir más, y el de usuario el de 100. Es conveniencia para quien escribe, **no** control: el validador de servidor de T037 sigue siendo la única frontera de confianza. El mínimo de 8 NO se declara aquí, por el mismo motivo que en T037: revelaría la política
+- [ ] T041 [US1] Implementar la pantalla de ingreso en `src/3. Presentation/Optica.Web/Componentes/Paginas/Login.razor` con render en servidor, los **cuatro estados** de la tabla del plan, foco inicial en el campo de usuario, recorrido completo por teclado y mensaje de error con ícono además del color (compuerta G9). El mensaje de error incluye la línea de orientación **fija y siempre presente** de FR-004a, que da salida al usuario legítimo con la cuenta bloqueada sin revelar que lo está. El campo de contraseña declara el **tope de 12 caracteres** de FR-003a en el propio control, de modo que el formulario no permita escribir más, y el de usuario el de 100. Es conveniencia para quien escribe, **no** control: el validador de servidor de T037 sigue siendo la única frontera de confianza. El mínimo de 8 NO se declara aquí, por el mismo motivo que en T037: revelaría la política
 
 #### Pruebas de navegador de la pantalla de ingreso (decisión D-13)
 
@@ -254,6 +254,9 @@ Cierran los dos huecos que registra [qa/.../trazabilidad.md](../../qa/001-auth-r
 - [ ] T092 [P] Crear el archivo de presentación de cada proyecto con propósito, preparación del entorno y uso básico (sección Documentación de la constitución)
 - [ ] T093 Ejecutar de principio a fin [quickstart.md](./quickstart.md) en una máquina limpia y corregir cualquier paso que no funcione tal como está escrito
 - [ ] T094 Verificar las diez compuertas de calidad del plan y registrar el resultado antes de cerrar la feature
+- [ ] T095 [P] Exponer las métricas de FR-040 para ingreso, renovación y cambio de roles: latencia, volumen y tasa de error, como exige el principio VIII para operaciones críticas. Tarea propia y no dentro de T024: el registro estructurado responde "qué pasó" y las métricas "cómo va", y mezclarlas produce una tarea que no se puede cerrar de forma limpia (decisión registrada en Assumptions)
+- [ ] T096 Implementar el mecanismo de purga de FR-041 con las dos políticas de la decisión D-15: intentos de ingreso a un año, credenciales de renovación revocadas o vencidas a treinta días. **Nunca** purga registros de auditoría, que son inalterables por el principio VII. Los dos valores están en Assumptions marcados como confirmables con el responsable
+- [ ] T097 [P] Verificar que la aplicación exige canal cifrado según FR-039, y que un arranque sin él falla de forma explícita en lugar de dejar las cookies de sesión inservibles con un error que no explica la causa
 
 ---
 
@@ -349,18 +352,22 @@ empezar antes de que US4 esté cerrada**.
 
 | Fase | Tareas | Pruebas | Implementación |
 |---|---|---|---|
-| 1 Setup | T001–T012 | — | 12 |
-| 2 Foundational | T013–T026 | 2 | 12 |
-| 3 US1 Ingreso (P1) | T027–T041 | 6 | 9 |
+| 1 Setup | T001–T012 | 1 | 11 |
+| 2 Foundational | T013–T026 | 3 | 11 |
+| 3 US1 Ingreso (P1) | T027–T041k | 10 | 16 |
 | 4 US2 Sesión (P1) | T042–T059 | 7 | 11 |
 | 5 US3 Bloqueo (P2) | T060–T067 | 4 | 4 |
 | 6 US4 Roles (P2) | T068–T079 | 6 | 6 |
-| 7 US5 Base técnica (P3) | T080–T085 | 3 | 3 |
-| 8 Polish | T086–T094 | 4 | 5 |
-| **Total** | **94** | **32** | **62** |
+| 7 US5 Base técnica (P3) | T080–T085 | 4 | 2 |
+| 8 Polish | T086–T097 | 5 | 7 |
+| **Total** | **108** | **40** | **68** |
 
-Las 32 tareas de prueba cubren los 32 escenarios de aceptación numerados más los 9 casos borde de
-la especificación, agrupados por archivo según la matriz de
+La fase 3 incluye las once tareas de navegador T041a a T041k, añadidas por la decisión D-13. La
+fase 8 incluye T095 a T097, añadidas al recorrer los checklists: métricas de FR-040, purga de
+FR-041 y verificación del canal cifrado de FR-039.
+
+Las tareas de prueba cubren los 32 escenarios de aceptación numerados, los 9 casos borde de la
+especificación y los 16 casos de navegador, agrupados por archivo según la matriz de
 [contracts/trazabilidad.md](./contracts/trazabilidad.md).
 
 ## Notes

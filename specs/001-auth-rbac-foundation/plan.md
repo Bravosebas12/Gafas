@@ -37,7 +37,7 @@ casos de uso), FluentValidation (validadores de comando y consulta), EF Core 10 
 `TimeProvider` de la biblioteca base (fuente de tiempo)
 
 **Storage**: SQL Server. Esquema existente y **congelado** en
-[Scripts/SQL/001_modelo_datos_optica.sql](../../Scripts/SQL/001_modelo_datos_optica.sql); esta
+[Scripts/SQL/001_modelo_datos_optica.sql](../../Scripts/SQL/001_modelo_datos_optica.sql), **anclado al commit `6f9e0b2` del 2026-08-20, blob `a0ae82f3023b`, 633 líneas**: si el script cambia, el diseño de esta feature DEBE revalidarse en lugar de quedar inválido en silencio. Esta
 feature consume `ADMINISTRACION_USUARIOS` (`Empleados`, `Roles`, `Usuarios`, `UsuariosRoles`,
 `RefreshTokens`, `LoginAttempts`) y `AUDITORIA.LogUsuarios`. Base y login de aplicación creados
 por los scripts `000` y `003`; roles sembrados por `002`
@@ -61,7 +61,7 @@ clave entre 200 y 400 ms
 
 **Constraints**: sin proveedores de identidad externos; sin secretos en el repositorio; sin
 cambios de esquema; toda entrada y salida asíncrona con token de cancelación propagado hasta el
-repositorio; marcas de tiempo en UTC sobre una única fuente; **contraseña de 8 a 12 caracteres**
+repositorio; marcas de tiempo en UTC sobre una única fuente; **canal cifrado obligatorio** (FR-039), sin el cual el navegador descarta las cookies de sesión; **contraseña de 8 a 12 caracteres**
 (FR-003a), rango que se valida completo al establecerla y solo en su tope al ingresar, para no
 romper el mensaje genérico único de FR-004
 
@@ -81,19 +81,19 @@ resueltos antes de este plan, y las decisiones técnicas abiertas se cerraron en
 
 Marca cada compuerta como PASA, FALLA o N/A. Una compuerta en FALLA bloquea el avance; si es
 una desviación deliberada, DEBE registrarse en Complexity Tracking junto con la alternativa
-simple que se descartó. Referencia: `.specify/memory/constitution.md` v2.0.0.
+simple que se descartó. Referencia: `.specify/memory/constitution.md` **v2.1.0**.
 
 | # | Compuerta | Estado | Nota |
 |---|---|---|---|
 | G1 | Regla de dependencias entre capas respetada (Principio II) | PASA | Seis proyectos con las referencias exactas de la tabla del principio II. Prueba automatizada con `NetArchTest` (D-09), más la prohibición de EF Core, `IConfiguration`, `HttpContext` y `DateTime` en `Optica.Domain` |
 | G2 | Casos de uso como comandos/consultas, sin lógica en controladores (III) | PASA | 7 comandos y 2 consultas bajo MediatR. Los endpoints solo reciben, despachan y mapean a HTTP; el contrato de cada uno está en [contracts/](./contracts/) |
 | G3 | Plan de cobertura ≥85% global y ≥90% en dominio y aplicación (IV) | PASA | Umbrales declarados en `Directory.Build.props` y verificados por coverlet en el objetivo de pruebas; el proceso falla por debajo. Sin integración continua todavía, se ejecuta con un objetivo local documentado en [quickstart.md](./quickstart.md) |
-| G4 | Cada criterio de aceptación de la spec tiene prueba prevista (IV) | PASA | Matriz de trazabilidad de los 32 escenarios de aceptación en [contracts/trazabilidad.md](./contracts/trazabilidad.md) |
+| G4 | Cada criterio de aceptación de la spec tiene prueba prevista (IV) | PASA | Matriz de trazabilidad de los 32 escenarios de aceptación y los 9 casos borde en [contracts/trazabilidad.md](./contracts/trazabilidad.md), más el nivel de navegador de la decisión D-13 |
 | G5 | Sin proveedores de identidad externos ni secretos en código (VI) | PASA | Validador de configuración que falla el arranque ante cualquier proveedor externo declarado (FR-002) y prueba automática que lo verifica. Secreto de firma por gestor de secretos en desarrollo y variable de entorno en despliegue (D-08) |
 | G6 | Reglas críticas validadas en el servidor (VI) | PASA | Autorización por política en cada endpoint, con pruebas que invocan la operación directamente contra el servidor sin pasar por la interfaz (SC-005) |
 | G7 | Operaciones sensibles auditadas en la misma transacción (VII) | PASA | Interceptor de `SaveChanges` que escribe `AUDITORIA.LogUsuarios` dentro de la transacción de la operación (D-03), con prueba de integración que verifica el rollback conjunto |
 | G8 | Log estructurado con correlación y sin datos sensibles (VIII) | PASA | Identificador de correlación por petición propagado a los handlers; filtro que impide registrar contraseñas, tokens y credenciales de renovación, con prueba que inspecciona la salida |
-| G9 | Cuatro estados de vista, teclado, contraste y tokens de diseño (IX) | PASA | Aplica a la única pantalla de la feature. Los cuatro estados de la pantalla de ingreso se detallan más abajo; los colores provienen de los tokens de `docs/PLAN-MAQUETACION.md` mapeados al tema de MudBlazor |
+| G9 | Cuatro estados de vista, teclado, contraste y tokens de diseño (IX) | PASA | Aplica a la única pantalla de la feature. Los cuatro estados de la pantalla de ingreso se detallan más abajo; los colores provienen de los tokens de `docs/PLAN-MAQUETACION.md` mapeados al tema de MudBlazor. Nueve casos de navegador automatizan la compuerta (D-13) |
 | G10 | Sin cambios de esquema no propuestos sobre el modelo existente (X) | PASA | **Cero cambios de esquema.** El único punto que parecía exigir una columna nueva —detectar la reutilización de una credencial rotada— se resuelve con el estado de `REVOKED_AT`; análisis en D-05 |
 
 **Resultado**: 10 de 10 compuertas en PASA. No hay violaciones que justificar, pero sí cuatro
@@ -114,7 +114,7 @@ todos los endpoints se limitan a despachar casos de uso.
 specs/001-auth-rbac-foundation/
 ├── spec.md              # Especificación (ya existente)
 ├── plan.md              # Este archivo
-├── research.md          # Fase 0: decisiones técnicas D-01 a D-12
+├── research.md          # Fase 0: decisiones técnicas D-01 a D-15
 ├── data-model.md        # Fase 1: entidades contra el esquema existente
 ├── quickstart.md        # Fase 1: puesta en marcha en máquina limpia
 ├── contracts/           # Fase 1: contratos de endpoints y trazabilidad
@@ -218,7 +218,7 @@ los cuatro. Contraste verificado sobre los tokens de `docs/PLAN-MAQUETACION.md`.
 
 ### Fase 0 — Investigación: **completada**
 
-Salida: [research.md](./research.md), con las decisiones D-01 a D-12 y sus alternativas
+Salida: [research.md](./research.md), con las decisiones D-01 a D-15 y sus alternativas
 descartadas. Ningún marcador de clarificación quedó abierto.
 
 ### Fase 1 — Diseño y contratos: **completada**
@@ -238,7 +238,7 @@ Salidas:
   los scripts SQL y la creación del primer Administrador.
 - Contexto del agente actualizado en [CLAUDE.md](../../CLAUDE.md).
 
-### Fase 2 — Tareas: **pendiente**
+### Fase 2 — Tareas: **completada**
 
 La genera `/speckit-tasks`. Orden de implementación sugerido, derivado de las prioridades de la
 especificación y de las dependencias técnicas:

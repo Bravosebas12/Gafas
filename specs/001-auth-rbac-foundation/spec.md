@@ -181,6 +181,14 @@ El equipo dispone de una solución compilable con las capas definidas en la espe
 - **FR-036**: La medición de cobertura DEBE ejecutarse automáticamente y fallar el proceso por debajo de 85% global o 90% en dominio y aplicación.
 - **FR-037**: Toda operación de ingreso, renovación, bloqueo y cambio de roles DEBE emitir registro estructurado con identificador de correlación.
 
+**Auditoría, observabilidad y operación** *(añadidos 2026-08-21 al recorrer los checklists)*
+
+- **FR-038**: El sistema DEBE escribir en la tabla de auditoría **exactamente** estos eventos, y esta lista es exhaustiva para la feature: bloqueo de cuenta (FR-021), cambio de roles (FR-028), **cierre de sesión** y **revocación en cascada de credenciales por reutilización** (FR-013). La renovación de sesión DEBE quedar en el registro estructurado de FR-037 y **no** en la tabla de auditoría: ocurre cada 15 minutos por usuario, unas 30 veces por jornada, y no aporta información que la traza de intentos y el log no tengan.
+- **FR-039**: La aplicación DEBE servirse exclusivamente sobre canal cifrado. Un arranque configurado sin canal cifrado DEBE fallar de forma explícita, salvo en el entorno de desarrollo local. Sin esto las credenciales de sesión viajan en claro y el navegador descarta las cookies marcadas como seguras, de modo que el sistema no funciona y falla por un motivo que no explica la causa.
+- **FR-040**: Las operaciones de ingreso, renovación y cambio de roles DEBEN exponer métricas de latencia, volumen y tasa de error, como exige el principio VIII de la constitución para operaciones críticas.
+- **FR-041**: El sistema DEBE ofrecer un mecanismo de purga para las trazas que crecen sin límite: los intentos de ingreso, que acumulan una fila por intento incluidos los de un atacante, y las credenciales de renovación, que acumulan una fila por rotación. La purga NO DEBE borrar registros de auditoría, que son inalterables por el principio VII.
+- **FR-004a**: El mensaje genérico de rechazo del ingreso DEBE incluir una línea de orientación **fija y siempre presente**, que indique a quién dirigirse si el problema persiste. Al estar siempre visible no revela nada sobre el estado de la cuenta, y da salida al usuario legítimo cuya cuenta está bloqueada, que de otro modo queda quince minutos sin ninguna acción posible.
+
 ### Key Entities
 
 - **Empleado**: Persona que trabaja en la óptica. Nombre y apellido. Un empleado tiene como máximo un usuario.
@@ -207,6 +215,10 @@ El equipo dispone de una solución compilable con las capas definidas en la espe
 - **SC-010**: El sistema no expone ninguna vía de ingreso mediante proveedores de identidad externos, verificado por prueba automática.
 
 ## Assumptions
+
+- **Decidido 2026-08-21:** el token de acceso se firma con **HS256 y clave simétrica única**, sin rotación programada en esta feature (decisión D-08a). Quien firma y quien valida son el mismo proceso, así que la asimetría de RS256 no compra nada aquí. La rotación de clave y la invalidación masiva de sesiones ante fuga del secreto quedan como **hueco registrado**, abierto en los checklists de seguridad, y DEBEN resolverse antes de exponer la aplicación a internet.
+- **Decidido 2026-08-21:** los valores iniciales de retención de FR-041 son **un año** para los intentos de ingreso y **treinta días** para las credenciales de renovación ya revocadas o vencidas. Son valores por omisión defendibles para una traza de seguridad, no un requisito del negocio: DEBEN confirmarse con el responsable y son revisables sin impacto técnico, porque nada depende de ellos salvo el propio proceso de purga.
+- **Decidido 2026-08-21:** las métricas de FR-040 se implementan en una tarea propia de la fase de pulido, no dentro de la tarea del registro estructurado. Son dos capacidades distintas —una responde "qué pasó" y la otra "cómo va"— y mezclarlas produce una tarea que no se puede dar por terminada de forma limpia.
 
 - El ecosistema técnico está fijado por [ESPECIFICACION_TECNICA.md](../../HU/Historias_Tecnicas/ESPECIFICACION_TECNICA.md): .NET 10, Blazor Web App con MudBlazor, Clean Architecture, CQRS con MediatR y SQL Server propio. No se reevalúa en esta feature.
 - La presentación es una Blazor Web App unificada, con render en servidor para las pantallas de consulta e islas WebAssembly donde se requiere interactividad, según [ADR-001](../../docs/adr/ADR-001-modelo-presentacion-blazor-web-app.md). La pantalla de ingreso se resuelve con render en servidor: no necesita interactividad cliente y así evita descargar el runtime antes de autenticar.
