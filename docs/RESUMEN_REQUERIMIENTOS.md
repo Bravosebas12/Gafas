@@ -48,7 +48,7 @@
 - Clean Architecture / Arquitectura Cebolla
 - Patrón CQRS (comandos/consultas separados)
 - Orquestación con MediatR
-- Blazor WebAssembly + MudBlazor
+- Blazor Web App (.NET 10) con MudBlazor: render en servidor para consultas, islas WebAssembly para POS y formularios
 - Base de datos SQL propia
 
 ### Seguridad
@@ -66,7 +66,7 @@
 - Usuario creación/actualización/fecha en todas las tablas
 
 ### UX/UI
-- Blazor WebAssembly compatible
+- Blazor Web App con modo de render declarado por pantalla
 - Mobile-first responsive
 - Estados de carga y error controlados
 - Componentes reutilizables

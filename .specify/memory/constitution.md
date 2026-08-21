@@ -1,6 +1,31 @@
 <!--
-SYNC IMPACT REPORT
-==================
+SYNC IMPACT REPORT — v2.1.0 (MINOR)
+===================================
+Cambio de versión: 2.0.0 → 2.1.0
+
+Razón: la capa de presentación pasa de API REST separada más cliente WebAssembly a una
+Blazor Web App unificada de .NET 10 con modos de render mixtos, según
+docs/adr/ADR-001-modelo-presentacion-blazor-web-app.md. El principio II mantiene su regla
+—las dependencias apuntan al dominio— y solo cambian dos filas de su tabla de proyectos, más
+dos restricciones nuevas sobre compilación a WebAssembly y declaración del modo de render.
+No se remueve ni redefine ningún principio, por eso es MENOR y no MAYOR.
+
+Cambios:
+- II. Arquitectura Limpia: filas Optica.API → Optica.Web y Optica.Client.Blazor →
+  Optica.Web.Client; se añade la restricción de que Optica.Shared no reciba dependencias
+  exclusivas de servidor y la obligación de declarar el modo de render por componente.
+
+Artefactos actualizados en la misma entrega:
+- ✅ HU/Historias_Tecnicas/ESPECIFICACION_TECNICA.md — estructura, capas y entregables
+- ✅ docs/RESUMEN_REQUERIMIENTOS.md — arquitectura y UX/UI
+- ✅ HU/Historias_Tecnicas/RF-*.md — 26 historias, nivel 2 de C4 y criterio de consumo
+- ✅ specs/001-auth-rbac-foundation/spec.md — supuestos y base técnica
+- ✅ .agents/skills/dotnet-clean-architecture/SKILL.md — tabla de dependencias y capas
+- ✅ .agents/skills/ux-ui-optica/SKILL.md — modos de render
+- ✅ docs/adr/ADR-001-modelo-presentacion-blazor-web-app.md — decisión registrada
+
+REPORTE ANTERIOR — v2.0.0 (MAJOR)
+=================================
 Cambio de versión: 1.0.0 → 2.0.0 (MAJOR)
 
 Razón del salto mayor: se redefine el principio de Arquitectura Limpia, cuya regla de
@@ -91,8 +116,8 @@ Las dependencias apuntan **hacia el dominio**. El dominio no conoce a nadie.
 | `Optica.Application` | `Domain`, `Shared` |
 | `Optica.Infrastructure` | `Application`, `Domain`, `Shared` |
 | `Optica.Shared` | nada del proyecto; DEBE compilar para WebAssembly |
-| `Optica.API` | `Application`, `Shared`, e `Infrastructure` solo para registrar inyección de dependencias |
-| `Optica.Client.Blazor` | `Shared` |
+| `Optica.Web` | `Application`, `Shared`, e `Infrastructure` solo para registrar inyección de dependencias |
+| `Optica.Web.Client` | `Shared` |
 
 - `Optica.Domain` NO DEBE contener referencias a ORM, atributos de serialización,
   `IConfiguration`, `HttpContext` ni acceso directo al reloj del sistema. El tiempo entra
@@ -101,6 +126,12 @@ Las dependencias apuntan **hacia el dominio**. El dominio no conoce a nadie.
   interfaz en la capa interna e implementarse en la externa. No existe otra vía.
 - La estructura de carpetas DEBE respetar la definida en
   `HU/Historias_Tecnicas/ESPECIFICACION_TECNICA.md`.
+- `Optica.Shared` NO DEBE recibir dependencias exclusivas de servidor, porque se ejecuta
+  también en WebAssembly. Una compilación para ese destino DEBE proteger la regla.
+- El modo de render DEBE declararse de forma explícita en cada componente de página. Un
+  componente interactivo NO DEBE depender de servicios disponibles solo en servidor, porque
+  ese fallo aparece en ejecución y no en compilación. Ver
+  `docs/adr/ADR-001-modelo-presentacion-blazor-web-app.md`.
 
 **Verificación**: una prueba de arquitectura automatizada DEBE fallar la compilación ante
 cualquier referencia que viole la tabla anterior.
@@ -363,4 +394,4 @@ diez compuertas. Cada revisión de código DEBE verificar el cumplimiento. Toda 
 DEBE registrarse en la tabla de seguimiento de complejidad del plan, con la alternativa
 más simple que se descartó y por qué. Una desviación no registrada es un defecto.
 
-**Version**: 2.0.0 | **Ratified**: 2026-07-21 | **Last Amended**: 2026-08-20
+**Version**: 2.1.0 | **Ratified**: 2026-07-21 | **Last Amended**: 2026-08-20

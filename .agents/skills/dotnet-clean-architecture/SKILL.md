@@ -37,8 +37,8 @@ OpticaSolution/
 │   │   ├── Optica.Infrastructure/
 │   │   └── Optica.Shared/
 │   └── 3. Presentation/
-│       ├── Optica.API/
-│       └── Optica.Client.Blazor/
+│       ├── Optica.Web/           (Blazor Web App: componentes SSR + endpoints HTTP)
+│       └── Optica.Web.Client/    (islas interactivas WebAssembly)
 ```
 
 ## Regla de dependencias
@@ -50,8 +50,8 @@ Las referencias apuntan **hacia el dominio**. Nunca al revés.
 | `Optica.Domain` | nada del proyecto; solo BCL |
 | `Optica.Application` | `Domain`, `Shared` |
 | `Optica.Infrastructure` | `Application`, `Domain`, `Shared` |
-| `Optica.API` | `Application`, `Infrastructure` (solo para registrar DI), `Shared` |
-| `Optica.Client.Blazor` | `Shared` |
+| `Optica.Web` | `Application`, `Infrastructure` (solo para registrar DI), `Shared` |
+| `Optica.Web.Client` | `Shared` |
 
 Si necesitas que `Domain` o `Application` alcancen algo de infraestructura, declara una interfaz en la capa interna e impleméntala en la externa. Esa es la única vía.
 
@@ -63,11 +63,21 @@ Si necesitas que `Domain` o `Application` alcancen algo de infraestructura, decl
 
 **Optica.Infrastructure** — Persistencia SQL, repositorios, emisión y validación de tokens, hashing de contraseñas, auditoría, `IClock`, configuración técnica. Ninguna regla de negocio.
 
-**Optica.Shared** — Contratos y DTOs compartidos entre API y cliente Blazor, constantes, validaciones comunes. Debe poder compilar para WebAssembly, así que nada de dependencias de servidor.
+**Optica.Shared** — Contratos y DTOs compartidos entre el servidor y las islas WebAssembly, constantes, validaciones comunes. Debe poder compilar para WebAssembly, así que nada de dependencias de servidor. Esta restricción muerde de verdad: si aquí entra algo que solo existe en servidor, el fallo aparece en ejecución dentro del navegador, no al compilar.
 
-**Optica.API** — Endpoints delgados: reciben la petición, la despachan por MediatR, mapean el resultado a HTTP. Cero lógica. La autorización se declara aquí y se valida en el servidor siempre, nunca confiando en que la UI oculte una opción.
+**Optica.Web** — Blazor Web App. Cumple dos funciones. Como interfaz: enrutado, layout, componentes de render estático en servidor y configuración del tema de MudBlazor. Como backend: endpoints delgados que reciben la petición, la despachan por MediatR y mapean el resultado a HTTP. Cero lógica de negocio. La autorización se declara aquí y se valida en el servidor siempre, nunca confiando en que la UI oculte una opción.
 
-**Optica.Client.Blazor** — Componentes MudBlazor, contenedores de estado en memoria para el flujo POS, manejo explícito de estados de carga y error.
+**Optica.Web.Client** — Solo los componentes que necesitan interactividad en el navegador, ejecutados en WebAssembly: punto de venta, formularios de fórmula optométrica, filtros en vivo y gráficos. Componentes MudBlazor, contenedores de estado en memoria para el flujo POS y manejo explícito de estados de carga y error.
+
+## Modos de render
+
+Ver `docs/adr/ADR-001-modelo-presentacion-blazor-web-app.md`.
+
+- Declara el modo de render **explícitamente** en cada componente de página. No dependas del valor por defecto.
+- Render estático en servidor por defecto: autenticación, listados, consultas, historial y administración. Evita descargar el runtime al navegador para mostrar una tabla.
+- Render interactivo WebAssembly solo donde la interacción sin recargas es el requisito: POS, fórmula optométrica, filtros en vivo, gráficos del dashboard.
+- Un componente interactivo **no puede** inyectar servicios que solo existen en servidor, como un repositorio o un `DbContext`. Consume endpoints HTTP.
+- Los endpoints que consumen las islas viven en `Optica.Web`. Las rutas y contratos declarados en las historias técnicas siguen vigentes; lo que cambió es dónde se hospedan.
 
 ## Convenciones de código
 

@@ -53,7 +53,7 @@ Dado que la historia pertenece al sistema de óptica
 Cuando un usuario ejecuta una operación sensible
 Entonces la acción se valida por rol y se registra en auditoría cuando aplica
 Escenario: rendimiento y usabilidad
-Dado que la historia se consume desde Blazor WebAssembly
+Dado que la historia se consume desde la interfaz Blazor Web App
 Cuando se solicita información al backend
 Entonces la respuesta debe ser eficiente y mostrar estados de carga o error controlados
 
@@ -73,7 +73,7 @@ Pantalla de registro de devolución con selección de productos, cantidades y ob
 **Diagramas C4 (Cuatro Niveles)**
 
 Nivel 1 - Sistema: Sistema Integral de Gestión de Inventario y Punto de Venta para Óptica.
-Nivel 2 - Contenedores: Optica.Client.Blazor, Optica.API, Optica.Infrastructure y base de datos SQL.
+Nivel 2 - Contenedores: Optica.Web (Blazor Web App con render en servidor y endpoints HTTP), Optica.Web.Client (islas interactivas WebAssembly), Optica.Infrastructure y base de datos SQL.
 Nivel 3 - Componentes: RegisterReturnCommand, ReturnRepository, KardexAdjustmentHandler.
 Nivel 4 - Código: entidades, value objects, handlers de MediatR, validadores, repositorios y endpoints correspondientes.
 

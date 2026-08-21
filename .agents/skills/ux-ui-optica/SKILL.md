@@ -115,7 +115,16 @@ Es el flujo crítico. Layout de tres zonas: cliente arriba, carrito a un lado, c
 - Componentes propios solo para lo compuesto y repetido: tarjeta de métrica, fila de carrito, insignia de estado, selector de cliente.
 - Cada componente recibe datos por parámetro y comunica por `EventCallback`. Sin consultas al servidor dentro de un componente de presentación.
 - Muestra estados de carga con los `skeleton` de la librería, no con un spinner suelto que descoloca el layout.
-- Compatible con WebAssembly: nada de dependencias de servidor en la capa de presentación.
+
+## Modos de render
+
+La aplicación es una Blazor Web App unificada de .NET 10, no un cliente WebAssembly completo. Ver `docs/adr/ADR-001-modelo-presentacion-blazor-web-app.md`.
+
+- Declara el modo de render **explícitamente** en cada página. Elegirlo es una decisión de diseño, no un detalle técnico: determina si la pantalla responde al instante o recarga.
+- **Render en servidor** para lo que solo se consulta: ingreso, listados, historial clínico y comercial, administración de usuarios. Carga más rápida y sin descargar el runtime.
+- **Interactivo WebAssembly** donde la interacción sin recargas es el requisito del negocio: punto de venta, formularios de fórmula optométrica, búsqueda en vivo y gráficos del dashboard.
+- Si dudas, empieza en servidor y promueve a interactivo solo cuando una interacción concreta lo exija. Lo contrario penaliza la primera carga de toda la aplicación.
+- Un componente interactivo NO puede inyectar servicios de servidor: consume endpoints HTTP. Si un diseño obliga a lo primero, la pantalla está en el modo equivocado.
 
 ## Antes de considerar terminado
 

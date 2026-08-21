@@ -205,7 +205,9 @@ El equipo dispone de una solución compilable con las capas definidas en la espe
 
 ## Assumptions
 
-- El ecosistema técnico está fijado por [ESPECIFICACION_TECNICA.md](../../HU/Historias_Tecnicas/ESPECIFICACION_TECNICA.md): .NET 10, Blazor WebAssembly con MudBlazor, Clean Architecture, CQRS con MediatR y SQL Server propio. No se reevalúa en esta feature.
+- El ecosistema técnico está fijado por [ESPECIFICACION_TECNICA.md](../../HU/Historias_Tecnicas/ESPECIFICACION_TECNICA.md): .NET 10, Blazor Web App con MudBlazor, Clean Architecture, CQRS con MediatR y SQL Server propio. No se reevalúa en esta feature.
+- La presentación es una Blazor Web App unificada, con render en servidor para las pantallas de consulta e islas WebAssembly donde se requiere interactividad, según [ADR-001](../../docs/adr/ADR-001-modelo-presentacion-blazor-web-app.md). La pantalla de ingreso se resuelve con render en servidor: no necesita interactividad cliente y así evita descargar el runtime antes de autenticar.
+- Los endpoints HTTP de autenticación se hospedan en el proyecto web, no en un proyecto de API separado. Las rutas y contratos de las historias RF-LOG siguen vigentes.
 - El modelo de datos de [001_modelo_datos_optica.sql](../../Scripts/SQL/001_modelo_datos_optica.sql) se toma como fuente de verdad; esta feature usa las tablas de `ADMINISTRACION_USUARIOS` y `AUDITORIA` ya definidas y no altera su diseño.
 - **Decidido 2026-08-20:** la duración del token de acceso es de 15 minutos y la de la credencial de renovación de 8 horas (FR-008, FR-009). El token corto limita la ventana de abuso ante una filtración; las 8 horas cubren la jornada sin reescribir contraseña, requisito de usabilidad del punto de venta.
 - **Decidido 2026-08-20:** los cambios de estado y de roles surten efecto al vencer el token de acceso, no mediante verificación en cada petición (FR-032). Se aceptó una ventana máxima de exposición de 15 minutos a cambio de no agregar una consulta a base de datos por petición, dado que el punto de venta es sensible a la latencia. La revocación inmediata de credenciales de renovación (FR-032a) impide que esa ventana se extienda.

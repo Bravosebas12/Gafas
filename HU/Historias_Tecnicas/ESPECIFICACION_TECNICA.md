@@ -4,7 +4,8 @@
 - **Documento fuente:** Especificación_Requerimientos_Optica_Blazor_v1.1.pdf
 - **Versión fuente:** v1.1
 - **Fecha de generación fuente:** Junio 2026
-- **Ecosistema tecnológico:** .NET 10 y Blazor WebAssembly
+- **Ecosistema tecnológico:** .NET 10 y Blazor Web App
+- **Desviación respecto a la fuente:** el PDF v1.1 fija Blazor WebAssembly con proyecto de API separado. Este documento adopta el modelo unificado de Blazor Web App de .NET 10. La decisión, su motivo y sus consecuencias están registradas en `docs/adr/ADR-001-modelo-presentacion-blazor-web-app.md`.
 
 ## Alcance
 El sistema centraliza la operación comercial y clínica de una óptica, incluyendo inventario especializado, punto de venta, facturación, clientes, historial clínico, autenticación interna, roles y dashboard operativo.
@@ -13,9 +14,11 @@ El sistema centraliza la operación comercial y clínica de una óptica, incluye
 - **Patrón arquitectónico:** Clean Architecture / Arquitectura Cebolla.
 - **Patrón de negocio:** CQRS para separar comandos y consultas.
 - **Orquestación de casos de uso:** MediatR en la capa de Application.
-- **Frontend:** Blazor WebAssembly con .NET 10.
+- **Frontend:** Blazor Web App con .NET 10, en un único proyecto web con modos de render mixtos.
+- **Modos de render:** render estático en servidor para pantallas de consulta y listados; render interactivo WebAssembly para las pantallas que exigen interacción sin recargas, principalmente el punto de venta y los formularios de fórmula optométrica.
 - **UI:** MudBlazor para componentes interactivos.
-- **Estado en cliente:** Contenedores de estado en memoria para gestión del POS sin recargas.
+- **Estado en cliente:** Contenedores de estado en memoria para gestión del POS sin recargas, en las islas interactivas WebAssembly.
+- **Endpoints HTTP:** hospedados en el mismo proyecto web. Las islas WebAssembly consumen los endpoints por HTTP igual que antes; lo que desaparece es el proyecto de API separado, no los contratos.
 - **Persistencia:** Base de datos SQL propia.
 - **Autenticación:** Nativa, sin proveedores externos.
 
@@ -30,8 +33,8 @@ OpticaSolution/
 │   │   ├── Optica.Infrastructure/
 │   │   └── Optica.Shared/
 │   └── 3. Presentation/
-│       ├── Optica.API/
-│       └── Optica.Client.Blazor/
+│       ├── Optica.Web/           (Blazor Web App: componentes SSR + endpoints HTTP)
+│       └── Optica.Web.Client/    (islas interactivas WebAssembly)
 ```
 
 ## Capas Técnicas
@@ -46,13 +49,13 @@ Contiene casos de uso bajo CQRS, validadores, DTOs, handlers de MediatR, interfa
 Implementa persistencia SQL, autenticación, JWT, refresh tokens, auditoría, repositorios, servicios externos internos y configuraciones técnicas.
 
 ### Optica.Shared
-Comparte contratos, DTOs, validaciones comunes, constantes, tipos y utilidades entre API y Blazor Client cuando sea apropiado.
+Comparte contratos, DTOs, validaciones comunes, constantes, tipos y utilidades entre el servidor y las islas WebAssembly. Debe poder compilar para WebAssembly, por lo que no admite dependencias exclusivas de servidor.
 
-### Optica.API
-Expone endpoints para autenticación, CRUD, ventas, inventario, clientes, dashboard y auditoría. Debe validar autorización y consistencia transaccional.
+### Optica.Web
+Proyecto web único. Cumple dos funciones. Como interfaz, aloja el enrutado, el layout, los componentes de render estático en servidor y la configuración del tema de MudBlazor. Como backend, expone los endpoints HTTP de autenticación, CRUD, ventas, inventario, clientes, dashboard y auditoría, que las islas WebAssembly consumen. Debe validar autorización y consistencia transaccional en cada endpoint.
 
-### Optica.Client.Blazor
-Implementa la interfaz de usuario con Blazor WebAssembly, MudBlazor y estado en memoria para flujos POS.
+### Optica.Web.Client
+Contiene los componentes que requieren interactividad en el navegador, ejecutados en WebAssembly: punto de venta, formularios de fórmula optométrica, filtros en vivo y gráficos del dashboard. Aquí viven los contenedores de estado en memoria del POS.
 
 ## Seguridad
 - Autenticación nativa contra SQL propia.
@@ -79,7 +82,7 @@ Implementa la interfaz de usuario con Blazor WebAssembly, MudBlazor y estado en 
 - Persistencia SQL con integridad referencial.
 - Trazabilidad de operaciones sensibles.
 - Consultas eficientes para dashboard y POS.
-- Compatibilidad con Blazor WebAssembly.
+- Compatibilidad con Blazor Web App: el código compartido debe compilar para WebAssembly.
 - Diseño extensible para futuras funcionalidades de óptica.
 
 ## Criterios de Aceptación Técnicos Generales
@@ -88,13 +91,13 @@ Implementa la interfaz de usuario con Blazor WebAssembly, MudBlazor y estado en 
 - La autenticación no depende de proveedores externos.
 - Las reglas críticas están validadas en backend.
 - Las historias técnicas de usuario tienen criterios de aceptación verificables.
-- La UI está implementada en Blazor WebAssembly con componentes reutilizables.
+- La UI está implementada como Blazor Web App, con componentes reutilizables y el modo de render declarado por pantalla.
 - Los datos sensibles tienen trazabilidad y control de acceso por rol.
 
 ## Entregables Esperados
 - Solución .NET 10 con la estructura propuesta.
-- API REST para operaciones de negocio.
-- Cliente Blazor WebAssembly.
+- Endpoints HTTP para operaciones de negocio, hospedados en el proyecto web.
+- Islas interactivas WebAssembly para punto de venta, fórmula optométrica y gráficos.
 - Modelos de dominio para óptica, inventario, ventas, clientes y usuarios.
 - Implementación de autenticación nativa y RBAC.
 - Dashboard con KPIs, gráficos y alertas.
