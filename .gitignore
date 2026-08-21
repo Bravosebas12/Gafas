@@ -5,3 +5,9 @@
 .kilo/skills/modern-web-design/
 .kilo/skills/ux-ui-design/
 .kilo/skills/web-design-pro/
+
+# Spec Kit - herramientas generadas (no versionar)
+.github/agents/speckit.*
+.github/prompts/speckit.*
+.github/copilot-instructions.md
+.vscode/settings.json
