@@ -3,13 +3,15 @@
 **Feature**: 001-auth-rbac-foundation
 **Sostiene la compuerta G4**: "cada criterio de aceptación tiene prueba correspondiente".
 
-Los 32 escenarios de aceptación de [spec.md](../spec.md) se listan aquí con el tipo de prueba que
-los cubre y el proyecto donde vive. El principio IV exige además que las pruebas se nombren por el
+Los 32 escenarios de aceptación numerados de [spec.md](../spec.md) se listan aquí con el tipo de
+prueba que los cubre y el proyecto donde vive, seguidos de los 9 casos borde de la especificación,
+que se marcan como tales. El principio IV exige además que las pruebas se nombren por el
 comportamiento esperado, no por el método que ejercitan.
 
 **Tipos**: `Dominio` = `Optica.Domain.Tests` · `Aplicación` = `Optica.Application.Tests` ·
 `Integración` = `Optica.Integration.Tests` (SQL Server real) · `Arquitectura` =
-`Optica.Architecture.Tests`
+`Optica.Architecture.Tests` · `Navegador` = `Optica.E2E.Tests` (Playwright con NUnit, decisión
+D-13)
 
 ---
 
@@ -103,6 +105,38 @@ Todos exigen prueba. Se listan aparte para que ninguno se pierda al generar las 
 | Desfase de reloj entre aplicación y base de datos | Integración | Prueba propia: los vencimientos se calculan en la aplicación, no mezclando `SYSUTCDATETIME()` con la hora del proceso (D-07) |
 | Petición sin credencial, malformada o con firma inválida | Integración | Prueba propia: tres casos, todos 401 sin detalle (FR-016) |
 | Empleado sin usuario, o usuario cuyo empleado fue dado de baja | Dominio | Prueba propia. **Atención**: `Empleados` no tiene columna de baja lógica en el esquema, así que "empleado dado de baja" no es representable hoy. Se prueba lo que sí existe —usuario inactivo— y se anota como punto a resolver en la feature RF-USR, que es la dueña de la gestión de empleados |
+
+---
+
+## Nivel navegador — pantalla de ingreso (decisión D-13)
+
+Segunda capa sobre la pantalla de ingreso, en `Optica.E2E.Tests` con Playwright y NUnit. Los casos
+están especificados en
+[qa/001-auth-rbac-foundation/casos-de-prueba/login-e2e-playwright.md](../../../qa/001-auth-rbac-foundation/casos-de-prueba/login-e2e-playwright.md).
+
+**No alteran el total de 41 pruebas previstas**, y conviene entender por qué: la mayoría son una
+segunda capa sobre escenarios que ya tienen prueba por debajo, y los que aportan cobertura nueva
+—SC-001 y la compuerta G9— no son escenarios de aceptación numerados, así que no entran en el
+conteo que sostiene G4.
+
+| Caso | Cubre | Aporte propio |
+|---|---|---|
+| CP-E2E-01 | Escenario 1.1 | Segunda capa: el recorrido real del navegador |
+| CP-E2E-02 | **SC-001** | **Sí.** Único que mide el recorrido completo bajo 3 segundos |
+| CP-E2E-03 a 05 | **Compuerta G9** | **Sí.** Los cuatro estados de la vista |
+| CP-E2E-06 | Escenarios 1.2, 1.4 y 3.5 | **Sí.** Verifica que las cuatro causas se ven idénticas en pantalla, no solo que el handler devuelve el mismo error |
+| CP-E2E-07, 08, 15 | **Compuerta G9** | **Sí.** Lector de pantalla, teclado con foco visible y contraste |
+| CP-E2E-09 | Principio IX | **Sí.** Usable a 360 píxeles |
+| CP-E2E-10 | Escenario 2.1, FR-015 | **Sí.** Que el navegador **respete** `HttpOnly`, no solo que la cabecera lo declare |
+| CP-E2E-11 | Escenario 1.5, SC-010 | Segunda capa: la pantalla no ofrece proveedores externos |
+| CP-E2E-12 | Escenarios 3.1 y 3.2 | Segunda capa: el bloqueo provocado desde la interfaz |
+| CP-E2E-13 | Escenario 4.10 | Segunda capa: usuario sin roles |
+| CP-E2E-14 | FR-003, regla R-U5 | **Sí.** La contraseña no queda en el documento ni en la dirección |
+
+**Fuera de este nivel, a propósito.** Los vencimientos de 15 minutos y 8 horas siguen en
+`Integración`: Playwright no puede mover el reloj del servidor. Y la igualación de tiempos de
+SC-004 se mide a nivel HTTP, porque el render del navegador introduce más varianza que los 100
+milisegundos que se quieren medir.
 
 ---
 

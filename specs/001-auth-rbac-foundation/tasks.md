@@ -91,7 +91,7 @@ tests/Optica.Application.Tests/       tests/Optica.Architecture.Tests/
 
 - [ ] T027 [P] [US1] Pruebas de las reglas R-U1 a R-U5 del usuario en `tests/Optica.Domain.Tests/Usuarios/UsuarioTests.cs`
 - [ ] T028 [P] [US1] Pruebas del handler de ingreso para contraseña incorrecta y usuario desactivado, escenarios 1.2 y 1.4, en `tests/Optica.Application.Tests/Autenticacion/IniciarSesionHandlerTests.cs`
-- [ ] T029 [P] [US1] Prueba de ida y vuelta del hash con caracteres no latinos, espacios y los bordes 8 y 12 del rango de FR-003a en `tests/Optica.Domain.Tests/Seguridad/HasheoDeContrasenaTests.cs`, verificando ausencia de corrupción y de truncamiento (FR-003b)
+- [ ] T029 [P] [US1] Prueba de ida y vuelta del hash con caracteres no latinos, espacios y los bordes 8 y 12 del rango de FR-003a en `tests/Optica.Integration.Tests/Seguridad/HasheoDeContrasenaTests.cs`, verificando ausencia de corrupción y de truncamiento (FR-003b). **Ubicación corregida**: el hasheador se implementa en `Optica.Infrastructure` (T034) y `Optica.Domain.Tests` solo referencia `Optica.Domain`, así que la ruta anterior exigía una referencia que viola el principio II y hace fallar la compuerta G1. La ubicación idónea sería un proyecto `Optica.Infrastructure.Tests` propio; hasta que exista, vive aquí, que es el único proyecto de prueba que referencia infraestructura
 - [ ] T030 [P] [US1] Pruebas de integración de los escenarios 1.1 y 1.6 en `tests/Optica.Integration.Tests/Autenticacion/IngresoTests.cs`, incluida la verificación de la fila en `LoginAttempts`
 - [ ] T031 [P] [US1] Prueba de igualación de tiempos del escenario 1.3 en `tests/Optica.Integration.Tests/Autenticacion/EnumeracionDeCuentasTests.cs`, que comprueba SC-004 con diferencia inferior a 100 ms
 - [ ] T032 [P] [US1] Prueba del escenario 1.5 en `tests/Optica.Integration.Tests/Configuracion/ProveedoresExternosTests.cs`: arrancar el host con un proveedor externo declarado debe lanzar excepción
@@ -106,11 +106,11 @@ tests/Optica.Application.Tests/       tests/Optica.Architecture.Tests/
 - [ ] T038 [US1] Implementar el registro de todo intento en `LoginAttempts`, con `USUARIO_ID` nulo cuando la cuenta no existe (FR-006, FR-022, reglas R-I1 a R-I4)
 - [ ] T039 [US1] Exponer `POST /api/auth/login` en `src/3. Presentation/Optica.Web/Endpoints/AutenticacionEndpoints.cs`, según [contracts/auth-endpoints.md](./contracts/auth-endpoints.md), limitado a recibir, despachar y mapear (principio III)
 - [ ] T040 [P] [US1] Mapear los tokens de color y tipografía de `docs/PLAN-MAQUETACION.md` al tema de MudBlazor en `src/3. Presentation/Optica.Web/Componentes/TemaOptica.cs`, sin valores literales (principio IX)
-- [ ] T041 [US1] Implementar la pantalla de ingreso en `src/3. Presentation/Optica.Web/Componentes/Paginas/Login.razor` con render en servidor, los **cuatro estados** de la tabla del plan, foco inicial en el campo de usuario, recorrido completo por teclado y mensaje de error con ícono además del color (compuerta G9)
+- [ ] T041 [US1] Implementar la pantalla de ingreso en `src/3. Presentation/Optica.Web/Componentes/Paginas/Login.razor` con render en servidor, los **cuatro estados** de la tabla del plan, foco inicial en el campo de usuario, recorrido completo por teclado y mensaje de error con ícono además del color (compuerta G9). El campo de contraseña declara el **tope de 12 caracteres** de FR-003a en el propio control, de modo que el formulario no permita escribir más, y el de usuario el de 100. Es conveniencia para quien escribe, **no** control: el validador de servidor de T037 sigue siendo la única frontera de confianza. El mínimo de 8 NO se declara aquí, por el mismo motivo que en T037: revelaría la política
 
 #### Pruebas de navegador de la pantalla de ingreso (decisión D-13)
 
-Cierran los dos huecos que registra [qa/.../trazabilidad.md](../../qa/001-auth-rbac-foundation/trazabilidad.md): SC-001 sin cubrir, y la compuerta G9 apoyada solo en una carta de exploración manual. Los quince casos están especificados en [qa/.../login-e2e-playwright.md](../../qa/001-auth-rbac-foundation/casos-de-prueba/login-e2e-playwright.md). Van después de T041 porque necesitan la pantalla construida.
+Cierran los dos huecos que registra [qa/.../trazabilidad.md](../../qa/001-auth-rbac-foundation/trazabilidad.md): SC-001 sin cubrir, y la compuerta G9 apoyada solo en una carta de exploración manual. Los dieciséis casos están especificados en [qa/.../login-e2e-playwright.md](../../qa/001-auth-rbac-foundation/casos-de-prueba/login-e2e-playwright.md). Van después de T041 porque necesitan la pantalla construida.
 
 - [ ] T041a [US1] Crear `tests/Optica.E2E.Tests/` con `Microsoft.Playwright.NUnit`, **excluido del cálculo de cobertura por capa** del principio IV y etiquetado para no correr en la compilación local rápida. **NUnit solo en este proyecto**: los cuatro existentes siguen en xUnit. Es una desviación deliberada del principio IV, registrada en Complexity Tracking del plan y justificada en D-13
 - [ ] T041b [US1] Instalar los navegadores de Playwright en la máquina y documentar el paso en [quickstart.md](./quickstart.md), porque sin ellos el proyecto compila pero ninguna prueba corre. Derivar las clases de prueba de la clase base de página de `Microsoft.Playwright.NUnit`, que da contexto de navegador aislado por prueba y cierre determinista
@@ -121,7 +121,7 @@ Cierran los dos huecos que registra [qa/.../trazabilidad.md](../../qa/001-auth-r
 - [ ] T041g [P] [US1] Implementar CP-E2E-06: las cuatro causas de rechazo se ven idénticas en la pantalla, texto y atributos accesibles incluidos (FR-004)
 - [ ] T041h [P] [US1] Implementar CP-E2E-07 a CP-E2E-09 y CP-E2E-15: lector de pantalla, recorrido por teclado con foco visible, 360 píxeles de ancho y contraste mínimo de 4.5 a 1 (compuerta G9)
 - [ ] T041i [P] [US1] Implementar CP-E2E-10: **leer las cookies desde JavaScript y comprobar que no aparecen**. Es la única prueba de que el navegador respeta `HttpOnly`, no solo de que la cabecera lo declara
-- [ ] T041j [P] [US1] Implementar CP-E2E-11 a CP-E2E-14: ausencia de proveedores externos en la pantalla (SC-010), bloqueo provocado con cinco envíos, usuario sin roles, y contraseña no expuesta en el documento ni en la dirección
+- [ ] T041j [P] [US1] Implementar CP-E2E-11 a CP-E2E-14 y CP-E2E-16: ausencia de proveedores externos en la pantalla (SC-010), bloqueo provocado con cinco envíos, usuario sin roles, el tope de 12 caracteres en el campo del formulario (FR-003a, hace verificable el control declarado en T041), y contraseña no expuesta en el documento ni en la dirección
 - [ ] T041k [US1] Configurar la conservación de captura de pantalla, video y traza en cada fallo, por configuración de la integración de NUnit y no por código en cada prueba. Sin ellos un fallo en integración continua es irreproducible
 
 **Checkpoint**: el ingreso funciona de extremo a extremo y no filtra la existencia de cuentas.
@@ -233,7 +233,7 @@ Cierran los dos huecos que registra [qa/.../trazabilidad.md](../../qa/001-auth-r
 
 ### Implementation for User Story 5
 
-- [ ] T083 [US5] Implementar el comando `crear-admin` en `src/3. Presentation/Optica.Web/Herramientas/CrearPrimerAdministrador.cs`, que crea el empleado y su usuario con rol Administrador, pide la contraseña por **entrada interactiva** y no por argumento, reutiliza el hasheador de T034 y audita la acción como `CREAR_PRIMER_ADMIN` (FR-035, decisión D-12)
+- [ ] T083 [US5] Implementar el comando `crear-admin` en `src/3. Presentation/Optica.Web/Herramientas/CrearPrimerAdministrador.cs`, que crea el empleado y su usuario con rol Administrador, pide la contraseña por **entrada interactiva** y no por argumento, reutiliza el hasheador de T034 y audita la acción como `CREAR_PRIMER_ADMIN` (FR-035, decisión D-12). **Valida el rango completo de 8 a 12 caracteres** antes de derivar el hash, rechazando con un mensaje que sí nombra la política, porque aquí no aplica el mensaje genérico de FR-004: quien crea el primer administrador es un operador con acceso a la máquina, no un solicitante anónimo (FR-003a)
 - [ ] T084 [US5] Verificar que la prueba de arquitectura de T013 cubre las seis filas de la tabla del principio II y añadir los casos que falten (escenario 5.2, compuerta G1)
 - [ ] T085 [US5] Ejecutar el reporte de cobertura y comprobar que el proceso falla por debajo de los umbrales, ajustando la configuración de coverlet si no lo hace (escenario 5.4, compuerta G3)
 
@@ -304,7 +304,7 @@ Fase 1 Setup
 # Las seis pruebas de US1 van en archivos distintos y se pueden escribir a la vez:
 Task: "T027 Reglas del usuario en tests/Optica.Domain.Tests/Usuarios/UsuarioTests.cs"
 Task: "T028 Handler de ingreso en tests/Optica.Application.Tests/Autenticacion/IniciarSesionHandlerTests.cs"
-Task: "T029 Hash con caracteres extremos en tests/Optica.Domain.Tests/Seguridad/HasheoDeContrasenaTests.cs"
+Task: "T029 Hash con caracteres extremos en tests/Optica.Integration.Tests/Seguridad/HasheoDeContrasenaTests.cs"
 Task: "T030 Ingreso de extremo a extremo en tests/Optica.Integration.Tests/Autenticacion/IngresoTests.cs"
 Task: "T031 Enumeración de cuentas en tests/Optica.Integration.Tests/Autenticacion/EnumeracionDeCuentasTests.cs"
 Task: "T032 Proveedores externos en tests/Optica.Integration.Tests/Configuracion/ProveedoresExternosTests.cs"

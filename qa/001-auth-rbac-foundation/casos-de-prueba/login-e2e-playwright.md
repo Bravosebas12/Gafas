@@ -300,7 +300,7 @@ cobertura por capa se miden por proyecto de prueba y este no debe entrar en ese 
 navegadores instalados, lo que no debe condicionar a quien solo quiere correr las pruebas de
 dominio; y su duración pide una etiqueta propia.
 
-**Cuándo se ejecutan.** Estos quince casos tardan minutos, no milisegundos. La compilación local
+**Cuándo se ejecutan.** Estos dieciséis casos tardan minutos, no milisegundos. La compilación local
 corre los cuatro proyectos de xUnit; la suite de navegador se ejecuta en integración continua y bajo
 demanda.
 
@@ -311,6 +311,28 @@ pasa. Queda documentado en `quickstart.md` como parte de T041b.
 **Qué se guarda cuando un caso falla.** Captura de pantalla, video y traza, por configuración de la
 integración de NUnit. Sin eso, un fallo en integración continua es irreproducible y termina en "en
 mi máquina pasa".
+
+---
+
+### CP-E2E-16 · El campo de contraseña no acepta más de 12 caracteres
+
+- **Técnica:** valor límite · **Requisito:** **FR-003a** · **Etiqueta:** `@limite`
+- **Precondiciones:** navegador en `/login`.
+- **Datos:** una cadena de 13 caracteres, `A234567890123`.
+
+| # | Acción | Resultado esperado |
+|---|---|---|
+| 1 | Escribir los 13 caracteres en el campo de contraseña | El valor del campo tiene 12 caracteres: el control no admitió el decimotercero |
+| 2 | Escribir 12 caracteres y enviar | La petición sale; el rechazo, si lo hay, es por credenciales y no por formato |
+| 3 | Escribir 7 caracteres y enviar | La petición **sale**: el formulario no bloquea por longitud mínima |
+
+> El paso 3 es el que importa y es contraintuitivo. FR-003a fija el mínimo en 8, pero el formulario
+> de ingreso **no** debe aplicarlo: si lo hiciera, la interfaz distinguiría "contraseña demasiado
+> corta" de "credencial incorrecta" y filtraría la política. El mínimo se aplica donde la
+> contraseña se establece, no donde se presenta.
+>
+> Este caso es el que hace verificable el tope declarado en el control por T041. Sin él, ese tope
+> es una afirmación de la tarea que nada comprueba.
 
 ---
 
@@ -329,6 +351,7 @@ mi máquina pasa".
 | CP-E2E-12 | FR-017, FR-019 | — |
 | CP-E2E-13 | FR-031 | — |
 | CP-E2E-14 | FR-003 | — |
+| CP-E2E-16 | **FR-003a** | **Sí:** el tope de 12 en el formulario, antes sin ninguna prueba |
 | CP-E2E-15 | Principio IX, G9 | **Sí:** contraste, antes solo exploratorio |
 
 **Efecto sobre la trazabilidad de la feature.** Con estos casos, SC-001 pasa de *sin cubrir* a

@@ -9,7 +9,7 @@ Característica: Sesión protegida con renovación, rotación y cierre
   Contrato: POST /api/auth/refresh, POST /api/auth/logout, GET /api/auth/session
 
   Antecedentes:
-    Dado que existe la cuenta "jperez" activa con contraseña "Optica2026#Segura"
+    Dado que existe la cuenta "jperez" activa con contraseña "Optica2026#"
     Y que "jperez" tiene asignado el rol "Vendedor"
     Y que el reloj de prueba marca "2026-08-20T08:00:00Z"
 

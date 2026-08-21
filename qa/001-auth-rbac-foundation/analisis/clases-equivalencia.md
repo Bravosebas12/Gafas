@@ -12,9 +12,9 @@ enlace entre el análisis y la prueba.
 
 | # | Clase | Representante | Resultado esperado | Escenario |
 |---|---|---|---|---|
-| V1 | Cuenta existente, activa, contraseña correcta | `jperez` / `Optica2026#Segura` | 200 con cookies de sesión | Credenciales correctas sobre cuenta activa conceden acceso |
+| V1 | Cuenta existente, activa, contraseña correcta | `jperez` / `Optica2026#` | 200 con cookies de sesión | Credenciales correctas sobre cuenta activa conceden acceso |
 | I1 | Cuenta inexistente | `fantasma` | 401 genérico | Las cuatro clases de rechazo devuelven una respuesta idéntica |
-| I2 | Cuenta existente, contraseña incorrecta | `jperez` / `ClaveEquivocada#1` | 401 genérico | ídem |
+| I2 | Cuenta existente, contraseña incorrecta | `jperez` / `ClaveMala#1` | 401 genérico | ídem |
 | I3 | Cuenta existente pero desactivada | `mlopez` con `ACTIVO = 0` | 401 genérico | Una cuenta desactivada lógicamente no puede ingresar |
 | I4 | Cuenta existente pero bloqueada | `rgomez` con bloqueo vigente | 401 genérico | Durante el bloqueo se rechaza incluso la contraseña correcta |
 | F1 | Formato inválido por longitud | 0 o 101 caracteres | 400 de validación | El límite de longitud del nombre de usuario separa el 400 del 401 |
@@ -33,10 +33,12 @@ límite de validación, pero no revelan si la cuenta existe, que es lo que impor
 
 | # | Clase | Representante | Resultado esperado | Escenario |
 |---|---|---|---|---|
-| V2 | Correcta para la cuenta | `Optica2026#Segura` | 200 | Credenciales correctas sobre cuenta activa conceden acceso |
-| V3 | Correcta con caracteres no latinos y espacios | `Ñandú Ópti¢a 2026 ✓` | 200, sin corrupción | Una contraseña con caracteres no latinos y espacios se acepta sin corrupción |
-| I5 | Incorrecta | `ClaveEquivocada#1` | 401 genérico | Las cuatro clases de rechazo devuelven una respuesta idéntica |
-| F2 | Formato inválido por longitud | 0 o 257 caracteres | 400 | El límite de longitud de la contraseña separa el 400 del 401 |
+| V2 | Correcta para la cuenta | `Optica2026#` | 200 | Credenciales correctas sobre cuenta activa conceden acceso |
+| V3 | Correcta con caracteres no latinos y espacios | `Ñandú Ó¢2026`, 12 caracteres | 200, sin corrupción | Una contraseña con caracteres no latinos y espacios se acepta sin corrupción |
+| I5 | Incorrecta | `ClaveMala#1` | 401 genérico | Las cuatro clases de rechazo devuelven una respuesta idéntica |
+| F2 | Vacía | `""` | 400, campo obligatorio | El límite de longitud de la contraseña separa el 400 del 401 |
+| F3 | Por debajo del mínimo de política | 1 o 7 caracteres | **401**, no 400: aplicar el mínimo aquí revelaría la política y rompería FR-004 | ídem |
+| F4 | Por encima del tope de FR-003a | 13 caracteres | 400 | ídem |
 
 La clase V3 no aparece en la especificación: sale del caso borde *"contraseña con caracteres no
 latinos, espacios o longitud extrema"*. Es la clase que rompe cuando la columna, la conexión o el

@@ -4,7 +4,7 @@ La trazabilidad existe para responder una pregunta: **qué requisito no tiene ni
 tabla donde todo aparece cubierto no sirve de nada; lo que sirve es la sección de huecos al final.
 
 - **Escenarios:** 81, en 5 archivos `.feature`
-- **Requisitos funcionales:** 39 de 39 con al menos un escenario
+- **Requisitos funcionales:** 41 de 41 con al menos un escenario
 - **Criterios de éxito:** 10 de 10 cubiertos
 - **Cartas de exploración:** 7
 
@@ -15,6 +15,8 @@ tabla donde todo aparece cubierto no sirve de nada; lo que sirve es la sección 
 | FR-001 validar contra base propia | autenticacion-login | 2 | equivalencia |
 | FR-002 rechazar proveedor externo | autenticacion-login | 2 | equivalencia |
 | FR-003 hash y salt | autenticacion-login | 3 | equivalencia |
+| FR-003a rango de 8 a 12 caracteres | autenticacion-login | 2 | límite |
+| FR-003b cualquier carácter en el rango | autenticacion-login | 1 | equivalencia |
 | FR-004 mensaje genérico idéntico | autenticacion-login, bloqueo-cuenta | 5 | equivalencia, límite |
 | FR-005 impedir ingreso a desactivados | autenticacion-login | 1 | equivalencia |
 | FR-006 registrar todo intento | autenticacion-login | 3 | equivalencia, límite |
@@ -124,7 +126,7 @@ defectos que una revisión de código no ve.
 accesibilidad de E-06: las herramientas automáticas detectan una fracción de los problemas reales
 de teclado y lector de pantalla, y el resto necesita a alguien recorriendo la pantalla.
 
-**Automatizar en la suite de navegador, aparte.** Los quince casos de
+**Automatizar en la suite de navegador, aparte.** Los dieciséis casos de
 [login-e2e-playwright.md](casos-de-prueba/login-e2e-playwright.md). Tardan minutos, no
 milisegundos, así que viven en su propio proyecto, quedan fuera del cálculo de cobertura por capa
 y se ejecutan en integración continua y bajo demanda, no en la compilación local rápida.

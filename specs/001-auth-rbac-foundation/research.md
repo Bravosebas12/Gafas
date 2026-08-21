@@ -312,7 +312,7 @@ roles. Los roles sí son catálogo y ya están ahí, correctamente; una credenci
 
 **Decisión**: automatizar con **Playwright** los casos de extremo a extremo de la pantalla de
 ingreso, en un proyecto de prueba propio `tests/Optica.E2E.Tests/`, excluido del cálculo de
-cobertura por capa y etiquetado para no correr en la compilación local rápida. Los quince casos
+cobertura por capa y etiquetado para no correr en la compilación local rápida. Los dieciséis casos
 están especificados en
 [qa/001-auth-rbac-foundation/casos-de-prueba/login-e2e-playwright.md](../../qa/001-auth-rbac-foundation/casos-de-prueba/login-e2e-playwright.md).
 

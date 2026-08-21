@@ -10,7 +10,7 @@ Característica: Ingreso con credenciales propias
 
   Antecedentes:
     Dado que existe el empleado "Juan Pérez" con la cuenta de usuario "jperez" activa
-    Y que la contraseña de "jperez" es "Optica2026#Segura"
+    Y que la contraseña de "jperez" es "Optica2026#"
     Y que "jperez" tiene asignado el rol "Vendedor"
     Y que el contador de intentos fallidos de "jperez" está en 0
     Y que la tabla LoginAttempts está vacía
@@ -21,7 +21,7 @@ Característica: Ingreso con credenciales propias
 
   @FR-001 @equivalencia @smoke
   Escenario: Credenciales correctas sobre cuenta activa conceden acceso
-    Cuando se envía POST /api/auth/login con nombreUsuario "jperez" y contraseña "Optica2026#Segura"
+    Cuando se envía POST /api/auth/login con nombreUsuario "jperez" y contraseña "Optica2026#"
     Entonces la respuesta tiene código 200
     Y el cuerpo contiene el campo "roles" con el valor ["Vendedor"]
     Y la respuesta incluye la cookie "optica_at" con los atributos HttpOnly, Secure y SameSite=Strict
@@ -30,7 +30,7 @@ Característica: Ingreso con credenciales propias
 
   @FR-001 @seguridad
   Escenario: La validación de credenciales consulta únicamente la base de datos propia
-    Cuando se envía POST /api/auth/login con nombreUsuario "jperez" y contraseña "Optica2026#Segura"
+    Cuando se envía POST /api/auth/login con nombreUsuario "jperez" y contraseña "Optica2026#"
     Entonces la respuesta tiene código 200
     Y no se registró ninguna petición de red hacia un host externo durante la autenticación
 
@@ -49,15 +49,15 @@ Característica: Ingreso con credenciales propias
 
     Ejemplos:
       | precondicion                                              | usuario     | clave                |
-      | no existe ninguna cuenta con nombre de usuario "fantasma"  | fantasma    | Optica2026#Segura    |
-      | la cuenta "jperez" está activa                            | jperez      | ClaveEquivocada#1    |
-      | la cuenta "mlopez" existe con ACTIVO = 0                  | mlopez      | Optica2026#Segura    |
-      | la cuenta "rgomez" está bloqueada hasta dentro de 10 min  | rgomez      | Optica2026#Segura    |
+      | no existe ninguna cuenta con nombre de usuario "fantasma"  | fantasma    | Optica2026#    |
+      | la cuenta "jperez" está activa                            | jperez      | ClaveMala#1    |
+      | la cuenta "mlopez" existe con ACTIVO = 0                  | mlopez      | Optica2026#    |
+      | la cuenta "rgomez" está bloqueada hasta dentro de 10 min  | rgomez      | Optica2026#    |
 
   @FR-005 @equivalencia
   Escenario: Una cuenta desactivada lógicamente no puede ingresar
-    Dado que la cuenta "mlopez" existe con ACTIVO = 0 y contraseña "Optica2026#Segura"
-    Cuando se envía POST /api/auth/login con nombreUsuario "mlopez" y contraseña "Optica2026#Segura"
+    Dado que la cuenta "mlopez" existe con ACTIVO = 0 y contraseña "Optica2026#"
+    Cuando se envía POST /api/auth/login con nombreUsuario "mlopez" y contraseña "Optica2026#"
     Entonces la respuesta tiene código 401
     Y no se emitió ninguna cookie de sesión
     Y la fila de "mlopez" en la tabla Usuarios sigue existiendo con ACTIVO = 0
@@ -65,8 +65,8 @@ Característica: Ingreso con credenciales propias
   @FR-004 @seguridad @SC-004
   Escenario: El tiempo de respuesta no permite deducir si una cuenta existe
     Dado que no existe ninguna cuenta con nombre de usuario "fantasma"
-    Cuando se envían 50 peticiones de ingreso con nombreUsuario "fantasma" y contraseña "ClaveEquivocada#1"
-    Y se envían 50 peticiones de ingreso con nombreUsuario "jperez" y contraseña "ClaveEquivocada#1"
+    Cuando se envían 50 peticiones de ingreso con nombreUsuario "fantasma" y contraseña "ClaveMala#1"
+    Y se envían 50 peticiones de ingreso con nombreUsuario "jperez" y contraseña "ClaveMala#1"
     Entonces la diferencia entre las medianas de tiempo de respuesta de los dos grupos es menor a 100 milisegundos
     Y ambos grupos devolvieron código 401 en las 100 peticiones
 
@@ -76,7 +76,7 @@ Característica: Ingreso con credenciales propias
 
   @FR-004 @limite
   Esquema del escenario: El límite de longitud del nombre de usuario separa el 400 del 401
-    Cuando se envía POST /api/auth/login con un nombreUsuario de <longitud> caracteres y contraseña "Optica2026#Segura"
+    Cuando se envía POST /api/auth/login con un nombreUsuario de <longitud> caracteres y contraseña "Optica2026#"
     Entonces la respuesta tiene código <codigo>
 
     Ejemplos:
@@ -116,13 +116,13 @@ Característica: Ingreso con credenciales propias
   @FR-003 @seguridad
   Escenario: La contraseña no se almacena en claro ni de forma reversible
     Cuando se consulta la fila de "jperez" en la tabla Usuarios
-    Entonces la columna PASSWORD_HASH no contiene la cadena "Optica2026#Segura" en ninguna codificación
+    Entonces la columna PASSWORD_HASH no contiene la cadena "Optica2026#" en ninguna codificación
     Y la columna PASSWORD_SALT tiene una longitud de al menos 16 bytes
     Y no existe ninguna columna que permita recuperar la contraseña original
 
   @FR-003 @seguridad
   Escenario: Dos cuentas con la misma contraseña producen hashes distintos
-    Dado que existe la cuenta "bdiaz" activa con contraseña "Optica2026#Segura"
+    Dado que existe la cuenta "bdiaz" activa con contraseña "Optica2026#"
     Cuando se comparan las filas de "jperez" y "bdiaz" en la tabla Usuarios
     Entonces los valores de PASSWORD_SALT de ambas filas son distintos
     Y los valores de PASSWORD_HASH de ambas filas son distintos
@@ -133,7 +133,7 @@ Característica: Ingreso con credenciales propias
 
   @FR-006 @auditoria
   Escenario: Un ingreso exitoso queda registrado
-    Cuando se envía POST /api/auth/login con nombreUsuario "jperez" y contraseña "Optica2026#Segura" desde la dirección "192.168.1.40"
+    Cuando se envía POST /api/auth/login con nombreUsuario "jperez" y contraseña "Optica2026#" desde la dirección "192.168.1.40"
     Entonces la tabla LoginAttempts contiene exactamente 1 fila
     Y esa fila tiene NOMBRE_USUARIO igual a "jperez"
     Y esa fila tiene EXITOSO igual a 1
@@ -144,7 +144,7 @@ Característica: Ingreso con credenciales propias
   @FR-006 @FR-022 @auditoria
   Escenario: Un intento contra una cuenta inexistente queda registrado sin crear la cuenta
     Dado que no existe ninguna cuenta con nombre de usuario "fantasma"
-    Cuando se envía POST /api/auth/login con nombreUsuario "fantasma" y contraseña "ClaveEquivocada#1" desde la dirección "192.168.1.41"
+    Cuando se envía POST /api/auth/login con nombreUsuario "fantasma" y contraseña "ClaveMala#1" desde la dirección "192.168.1.41"
     Entonces la tabla LoginAttempts contiene exactamente 1 fila
     Y esa fila tiene NOMBRE_USUARIO igual a "fantasma"
     Y esa fila tiene EXITOSO igual a 0
@@ -153,7 +153,7 @@ Característica: Ingreso con credenciales propias
 
   @FR-006 @limite
   Escenario: Una dirección de origen en el límite de 45 caracteres se registra completa
-    Cuando se envía POST /api/auth/login con nombreUsuario "jperez" y contraseña "ClaveEquivocada#1" desde la dirección "2001:0db8:85a3:0000:0000:8a2e:0370:7334"
+    Cuando se envía POST /api/auth/login con nombreUsuario "jperez" y contraseña "ClaveMala#1" desde la dirección "2001:0db8:85a3:0000:0000:8a2e:0370:7334"
     Entonces la tabla LoginAttempts contiene exactamente 1 fila
     Y esa fila tiene IP_ORIGEN igual a "2001:0db8:85a3:0000:0000:8a2e:0370:7334"
     Y el valor de IP_ORIGEN no está truncado
