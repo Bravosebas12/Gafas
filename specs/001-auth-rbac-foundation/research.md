@@ -39,6 +39,46 @@ esquema según el principio X.
 
 ---
 
+## D-01a — Longitud de la contraseña: entre 8 y 12 caracteres
+
+**Decisión**: rango de 8 a 12 caracteres, ambos inclusive (FR-003a). Decidido por el responsable
+del proyecto el 2026-08-20.
+
+**Rationale de la forma de aplicarlo**: el rango completo se valida donde la contraseña se
+establece; en el ingreso solo se valida el tope. Enforzar también el mínimo en el ingreso
+convertiría una contraseña corta en un 400, distinguible del 401 de credencial incorrecta, lo que
+revela la política y abre una grieta en el mensaje genérico único que exige FR-004.
+
+**Origen del valor anterior, y por qué era indefendible**: el contrato declaraba antes un tope de
+256 caracteres. Ese número no venía del esquema —la contraseña no se almacena, solo su derivación
+de tamaño fijo—, ni de la especificación, ni de ningún estándar. Con toda probabilidad se ancló en
+la columna `PASSWORD_HASH varbinary(256)`, cuyos 256 son **bytes del hash** y no tienen relación
+alguna con caracteres de contraseña. El análisis de valores límite de QA lo señaló como el único
+límite del documento sin respaldo verificable.
+
+**Desviación de los estándares, aceptada de forma explícita**: NIST SP 800-63B exige que el
+verificador admita **al menos 64 caracteres**, y OWASP ASVS recomienda lo mismo. Un tope de 12
+incumple ambos y, sobre todo, **impide las frases de contraseña**, que son la vía más simple para
+que una persona tenga una credencial fuerte y memorable. El riesgo residual queda acotado por dos
+mecanismos ya presentes en la feature: el bloqueo tras cinco intentos fallidos (FR-017) hace
+impracticable el ataque en línea, y las 600.000 iteraciones de D-01 encarecen el ataque fuera de
+línea si la base se filtrara.
+
+**Lo que NO es una razón para acotar la longitud**: el costo de la derivación. En
+PBKDF2-HMAC-SHA256 la contraseña actúa como clave HMAC y, si excede el tamaño de bloque, se
+comprime con un único hash a 32 bytes antes de que corran las 600.000 iteraciones sobre esa clave
+de tamaño fijo. Una contraseña de un megabyte añade un hash, no seiscientos mil. Ese argumento
+aplicaría a bcrypt, no al algoritmo de D-01.
+
+**Alternativas descartadas**: 128 caracteres, el tope que OWASP considera aceptable, y 64, el
+mínimo que NIST obliga a admitir. Se descartaron por decisión del responsable del proyecto.
+
+**Punto de revisión**: si el sistema se expone a internet o se audita contra un marco de
+cumplimiento, este tope debe revisarse. Cambiarlo es modificar un único valor: ni el esquema ni el
+algoritmo dependen de la longitud de entrada.
+
+---
+
 ## D-02 — Igualación de tiempos de respuesta (SC-004)
 
 **Decisión**: cuando el nombre de usuario no existe, el flujo de autenticación ejecuta igualmente

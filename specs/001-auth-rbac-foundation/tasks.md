@@ -91,7 +91,7 @@ tests/Optica.Application.Tests/       tests/Optica.Architecture.Tests/
 
 - [ ] T027 [P] [US1] Pruebas de las reglas R-U1 a R-U5 del usuario en `tests/Optica.Domain.Tests/Usuarios/UsuarioTests.cs`
 - [ ] T028 [P] [US1] Pruebas del handler de ingreso para contraseña incorrecta y usuario desactivado, escenarios 1.2 y 1.4, en `tests/Optica.Application.Tests/Autenticacion/IniciarSesionHandlerTests.cs`
-- [ ] T029 [P] [US1] Prueba de ida y vuelta del hash con caracteres no latinos, espacios y longitud extrema en `tests/Optica.Domain.Tests/Seguridad/HasheoDeContrasenaTests.cs`
+- [ ] T029 [P] [US1] Prueba de ida y vuelta del hash con caracteres no latinos, espacios y los bordes 8 y 12 del rango de FR-003a en `tests/Optica.Domain.Tests/Seguridad/HasheoDeContrasenaTests.cs`, verificando ausencia de corrupción y de truncamiento (FR-003b)
 - [ ] T030 [P] [US1] Pruebas de integración de los escenarios 1.1 y 1.6 en `tests/Optica.Integration.Tests/Autenticacion/IngresoTests.cs`, incluida la verificación de la fila en `LoginAttempts`
 - [ ] T031 [P] [US1] Prueba de igualación de tiempos del escenario 1.3 en `tests/Optica.Integration.Tests/Autenticacion/EnumeracionDeCuentasTests.cs`, que comprueba SC-004 con diferencia inferior a 100 ms
 - [ ] T032 [P] [US1] Prueba del escenario 1.5 en `tests/Optica.Integration.Tests/Configuracion/ProveedoresExternosTests.cs`: arrancar el host con un proveedor externo declarado debe lanzar excepción
@@ -102,7 +102,7 @@ tests/Optica.Application.Tests/       tests/Optica.Architecture.Tests/
 - [ ] T034 [P] [US1] Implementar PBKDF2-HMAC-SHA256 con 600.000 iteraciones, salt de 128 bits y clave de 256 bits en `src/2. Infrastructure/Optica.Infrastructure/Seguridad/HasheadorPbkdf2.cs` (decisión D-01)
 - [ ] T035 [US1] Añadir al hasheador la derivación señuelo de tiempo constante para usuarios inexistentes (decisión D-02, requisito de SC-004)
 - [ ] T036 [US1] Implementar `RepositorioDeUsuarios` en `src/2. Infrastructure/Optica.Infrastructure/Persistencia/RepositorioDeUsuarios.cs`, asíncrono y con token de cancelación propagado
-- [ ] T037 [US1] Implementar el comando de ingreso, su validador y su handler en `src/1. Core/Optica.Application/Autenticacion/Comandos/IniciarSesion/`, con el mensaje genérico único de FR-004
+- [ ] T037 [US1] Implementar el comando de ingreso, su validador y su handler en `src/1. Core/Optica.Application/Autenticacion/Comandos/IniciarSesion/`, con el mensaje genérico único de FR-004. El validador aplica **solo el tope de 12 caracteres**, nunca el mínimo de 8: aplicar el mínimo aquí convertiría la longitud en un canal que distingue contraseña corta de credencial incorrecta (FR-003a, decisión D-01a)
 - [ ] T038 [US1] Implementar el registro de todo intento en `LoginAttempts`, con `USUARIO_ID` nulo cuando la cuenta no existe (FR-006, FR-022, reglas R-I1 a R-I4)
 - [ ] T039 [US1] Exponer `POST /api/auth/login` en `src/3. Presentation/Optica.Web/Endpoints/AutenticacionEndpoints.cs`, según [contracts/auth-endpoints.md](./contracts/auth-endpoints.md), limitado a recibir, despachar y mapear (principio III)
 - [ ] T040 [P] [US1] Mapear los tokens de color y tipografía de `docs/PLAN-MAQUETACION.md` al tema de MudBlazor en `src/3. Presentation/Optica.Web/Componentes/TemaOptica.cs`, sin valores literales (principio IX)

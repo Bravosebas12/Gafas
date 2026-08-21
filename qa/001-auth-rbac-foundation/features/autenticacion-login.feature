@@ -92,16 +92,20 @@ Característica: Ingreso con credenciales propias
     Entonces la respuesta tiene código <codigo>
 
     Ejemplos:
-      | longitud | codigo | motivo                                                |
-      | 0        | 400    | por debajo del mínimo                                 |
-      | 1        | 401    | mínimo válido, credenciales incorrectas               |
-      | 256      | 401    | máximo válido, credenciales incorrectas               |
-      | 257      | 400    | por encima del máximo                                 |
+      | longitud | codigo | motivo                                                        |
+      | 0        | 400    | campo vacío, obligatorio                                      |
+      | 1        | 401    | bajo el mínimo de política: no se delata, se trata como fallo |
+      | 7        | 401    | justo bajo el mínimo: tampoco produce 400                     |
+      | 8        | 401    | mínimo de política, credenciales incorrectas                   |
+      | 12       | 401    | máximo exacto, credenciales incorrectas                        |
+      | 13       | 400    | por encima del máximo: único 400 por longitud en el ingreso   |
 
-  @FR-003 @equivalencia
+  @FR-003b @equivalencia
   Escenario: Una contraseña con caracteres no latinos y espacios se acepta sin corrupción
-    Dado que existe la cuenta "acruz" activa con contraseña "Ñandú Ópti¢a 2026 ✓"
-    Cuando se envía POST /api/auth/login con nombreUsuario "acruz" y contraseña "Ñandú Ópti¢a 2026 ✓"
+    # 12 caracteres exactos, el máximo de FR-003a, con acentos, espacio y símbolo no ASCII.
+    # Cubre a la vez el borde superior y la ausencia de corrupción o truncamiento.
+    Dado que existe la cuenta "acruz" activa con contraseña "Ñandú Ó¢2026"
+    Cuando se envía POST /api/auth/login con nombreUsuario "acruz" y contraseña "Ñandú Ó¢2026"
     Entonces la respuesta tiene código 200
     Y el cuerpo contiene el campo "roles"
 

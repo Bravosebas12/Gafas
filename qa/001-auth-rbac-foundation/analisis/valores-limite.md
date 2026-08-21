@@ -24,35 +24,52 @@ pasa la validación de formato y falla la de credenciales. **Esa es la aserción
 borde separa el 400 del 401, no el 400 del 200. Si un nombre de 100 caracteres devolviera 400, el
 sistema estaría rechazando entradas legítimas que la columna admite.
 
-## Longitud de `contrasena` — límites 1 y 256
+## Longitud de `contrasena` — rango 8 a 12 (FR-003a)
+
+**Actualizado 2026-08-20.** El tope de 256 que este documento señalaba como indefendible fue
+sustituido por un rango de **8 a 12 caracteres**, decidido por el responsable del proyecto y
+registrado en la decisión D-01a de `research.md`. La observación de este análisis quedó atendida.
+
+El rango se aplica en **dos planos distintos**, y esa distinción es lo que hay que probar:
+
+| Plano | Qué se valida | Dónde |
+|---|---|---|
+| Establecer la contraseña | Rango completo, 8 a 12 | Primer Administrador (FR-035), y creación y cambio en RF-USR y RF-CFG |
+| Ingresar | Solo el tope de 12 | `POST /api/auth/login` |
+
+### Bordes en el ingreso
+
+| Valor | Clase | Esperado | Por qué |
+|---|---|---|---|
+| 0 | vacío | 400 | Campo obligatorio |
+| 1 | por debajo del mínimo de política | **401** | El mínimo **no** se valida en el ingreso: devolver 400 revelaría la política y rompería el mensaje genérico único de FR-004 |
+| 7 | justo por debajo del mínimo | **401** | Mismo motivo |
+| 8 | mínimo de política | 401 | Formato válido, credenciales incorrectas |
+| 12 | máximo exacto | 401 | Formato válido, credenciales incorrectas |
+| 13 | por encima del máximo | 400 | Único borde de longitud que produce 400 en el ingreso |
+
+**La aserción que importa** es que el 400 aparece solo al superar 12. Los valores 1 y 7 son las
+pruebas que evitan la regresión más probable de esta implementación: que alguien aplique el
+`MinLength(8)` también en el validador del ingreso y, sin darse cuenta, convierta la longitud de la
+contraseña en un canal que distingue "contraseña corta" de "credencial incorrecta".
+
+### Bordes al establecer la contraseña
 
 | Valor | Clase | Esperado |
 |---|---|---|
-| 0 | por debajo del mínimo | 400 |
-| 1 | mínimo exacto | 401 |
-| 256 | máximo exacto | 401 |
-| 257 | por encima del máximo | 400 |
+| 7 | por debajo del mínimo | rechazo por validación |
+| 8 | mínimo exacto | aceptado |
+| 12 | máximo exacto | aceptado |
+| 13 | por encima del máximo | rechazo por validación |
 
-**Procedencia del límite superior, y una advertencia.** El 256 no viene de la base de datos —la
-contraseña no se almacena en claro, solo su derivación— ni de la especificación, que sobre esto
-solo dice *"longitud extrema: debe validarse y almacenarse sin corrupción ni truncamiento"*. Viene
-del contrato de `POST /api/auth/login`, y **no tiene ninguna decisión registrada que lo justifique**
-en `research.md`. Es el único límite de este documento sin respaldo verificable: el 100 del nombre
-de usuario sale de `NOMBRE_USUARIO nvarchar(100)`, el 45 de `IP_ORIGEN nvarchar(45)`, los tiempos
-de los requisitos, y este de una elección no documentada.
+### Nota sobre la procedencia del límite
 
-La razón defendible para tener un tope es no aceptar entrada sin cota en un endpoint anónimo, y el
-valor es razonable frente a la guía de OWASP, que pide admitir al menos 64 caracteres y permite
-rechazar por encima de 128. Lo que **no** es una razón válida es acotar el costo de la derivación:
-en PBKDF2-HMAC-SHA256 la contraseña se usa como clave HMAC y, si excede el tamaño de bloque, se
-comprime a 32 bytes con un único hash antes de que corran las 600.000 iteraciones sobre esa clave
-de tamaño fijo. Una contraseña de un megabyte añade un hash, no seiscientos mil. Ese argumento
-aplicaría a bcrypt o a un esquema que reinyecte la contraseña completa en cada iteración, no al
-que eligió la decisión D-01.
-
-**Pendiente:** que el contrato registre el porqué del 256, o que se alinee explícitamente con el
-mínimo de 64 que exige OWASP. Mientras no exista ese registro, los dos escenarios de borde prueban
-un número que nadie puede defender si se cuestiona en una revisión.
+A diferencia del 100 del nombre de usuario, que sale de `NOMBRE_USUARIO nvarchar(100)`, y del 45
+de `IP_ORIGEN nvarchar(45)`, este rango **no se deriva del esquema**: la contraseña no se almacena,
+solo su derivación de tamaño fijo. Es una decisión de política, y como tal está registrada en
+D-01a junto con su desviación explícita de NIST SP 800-63B, que exige admitir al menos 64
+caracteres. El argumento del costo de derivación que este documento ya descartaba sigue siendo
+inválido: en PBKDF2-HMAC-SHA256 una contraseña larga añade un hash, no seiscientos mil.
 
 ## Longitud de `IP_ORIGEN` — límite 45
 

@@ -10,9 +10,9 @@
 ## Completitud de los requisitos de credenciales
 
 - [ ] CHK001 ¿Está cuantificada la fuerza del hash de contraseña con criterios verificables —algoritmo, iteraciones, longitud de salt— o el requisito se queda en "función de hash segura"? [Clarity, Spec §FR-003]
-- [ ] CHK002 ¿Existe algún requisito de longitud mínima o complejidad para la contraseña del **primer Administrador**, dado que la política de complejidad se excluyó del alcance junto con RF-CFG-02? [Gap, Spec §FR-035]
-- [ ] CHK003 ¿Está definido el comportamiento requerido ante una contraseña de longitud extrema, con espacios o caracteres no latinos, más allá de mencionarlo como caso borde? [Coverage, Spec §Edge Cases]
-- [ ] CHK004 ¿Se especifica un límite superior de longitud de contraseña, y qué debe ocurrir al excederlo: rechazo o truncamiento? [Gap]
+- [x] CHK002 ¿Existe algún requisito de longitud mínima o complejidad para la contraseña del **primer Administrador**? [Gap, Spec §FR-035] — **RESUELTO 2026-08-20**: FR-003a fija un mínimo de 8 caracteres aplicable donde la contraseña se establece, incluida la creación del primer Administrador. La política de **complejidad** sigue perteneciendo a RF-CFG-02.
+- [x] CHK003 ¿Está definido el comportamiento ante una contraseña con espacios o caracteres no latinos? [Coverage, Spec §Edge Cases] — **RESUELTO 2026-08-20**: FR-003b lo declara de forma explícita, con escenario de prueba en `qa/.../features/autenticacion-login.feature`.
+- [x] CHK004 ¿Se especifica un límite superior de longitud de contraseña, y qué ocurre al excederlo? [Gap] — **RESUELTO 2026-08-20**: máximo de 12 caracteres (FR-003a), con **rechazo** y nunca truncamiento. Decisión D-01a, que registra la desviación consciente de NIST SP 800-63B.
 - [ ] CHK005 ¿Está declarado como requisito que la contraseña no debe aparecer en ningún log, traza ni mensaje de error, o solo se deduce del principio VIII de la constitución? [Traceability, Spec §FR-003]
 
 ## Completitud de los requisitos de sesión

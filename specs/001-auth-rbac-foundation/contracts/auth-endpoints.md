@@ -38,7 +38,7 @@ Autentica con credenciales propias y abre sesión. **Anónimo.**
 | Campo | Regla de validación |
 |---|---|
 | `nombreUsuario` | Obligatorio, 1 a 100 caracteres |
-| `contrasena` | Obligatorio, 1 a 256 caracteres. Se acepta cualquier carácter, incluidos espacios y no latinos |
+| `contrasena` | Obligatorio, **máximo 12 caracteres** (FR-003a). Se acepta cualquier carácter, incluidos espacios, acentos y no latinos. El mínimo de 8 **no** se valida aquí: una contraseña más corta se rechaza como credencial incorrecta con 401, no con 400, para no revelar la política ni romper el mensaje genérico de FR-004 |
 
 **Respuesta 200**
 
