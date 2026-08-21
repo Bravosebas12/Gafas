@@ -19,3 +19,6 @@
 .specify/memory/*
 !.specify/memory/constitution.md
 !.specify/templates/
+
+# MCP local: contiene credenciales de la BD local, no versionar
+.mcp.json

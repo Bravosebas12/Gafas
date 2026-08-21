@@ -625,34 +625,9 @@ CREATE INDEX IX_Formulas_ClienteFecha ON [CLINICA].FormulasOptometricas(ClienteI
 IF NOT EXISTS(SELECT 1 FROM sys.indexes WHERE name=N'IX_ProductosStock_STOCK_MINIMO' AND object_id=OBJECT_ID(N'[INVENTARIO].ProductosStock'))
 CREATE INDEX IX_ProductosStock_STOCK_MINIMO ON [INVENTARIO].ProductosStock(STOCK_ACTUAL, STOCK_MINIMO);
 
-IF NOT EXISTS(SELECT 1 FROM [CATALOGOS].EstadosOrden)
-BEGIN
-    INSERT [CATALOGOS].EstadosOrden(CODIGO, NOMBRE) VALUES(N'Abierta',N'Abierta');
-    INSERT [CATALOGOS].EstadosOrden(CODIGO, NOMBRE) VALUES(N'Abonada',N'Abonada');
-    INSERT [CATALOGOS].EstadosOrden(CODIGO, NOMBRE) VALUES(N'Pagada',N'Pagada');
-    INSERT [CATALOGOS].EstadosOrden(CODIGO, NOMBRE) VALUES(N'Entregada',N'Entregada');
-    INSERT [CATALOGOS].EstadosOrden(CODIGO, NOMBRE) VALUES(N'Cancelada',N'Cancelada');
-    INSERT [CATALOGOS].EstadosOrden(CODIGO, NOMBRE) VALUES(N'Anulada',N'Anulada');
-END;
-
-IF NOT EXISTS(SELECT 1 FROM [CATALOGOS].MetodosPago)
-BEGIN
-    INSERT [CATALOGOS].MetodosPago(CODIGO, NOMBRE) VALUES(N'Efectivo',N'Efectivo');
-    INSERT [CATALOGOS].MetodosPago(CODIGO, NOMBRE) VALUES(N'Transferencia',N'Transferencia');
-    INSERT [CATALOGOS].MetodosPago(CODIGO, NOMBRE) VALUES(N'Nequi',N'Nequi');
-    INSERT [CATALOGOS].MetodosPago(CODIGO, NOMBRE) VALUES(N'Tarjeta',N'Tarjeta');
-END;
-
-IF NOT EXISTS(SELECT 1 FROM [CATALOGOS].FiltrosLente)
-BEGIN
-    INSERT [CATALOGOS].FiltrosLente(NOMBRE) VALUES(N'Blue');
-    INSERT [CATALOGOS].FiltrosLente(NOMBRE) VALUES(N'Antireflejo');
-    INSERT [CATALOGOS].FiltrosLente(NOMBRE) VALUES(N'Normal');
-END;
-
-IF NOT EXISTS(SELECT 1 FROM [ADMINISTRACION_USUARIOS].Roles)
-BEGIN
-    INSERT [ADMINISTRACION_USUARIOS].Roles(CODIGO, NOMBRE) VALUES(N'Administrador',N'Administrador');
-    INSERT [ADMINISTRACION_USUARIOS].Roles(CODIGO, NOMBRE) VALUES(N'Vendedor',N'Vendedor');
-    INSERT [ADMINISTRACION_USUARIOS].Roles(CODIGO, NOMBRE) VALUES(N'Optometra',N'Optómetra');
-END;
+/* ---------------------------------------------------------------------------
+   Los datos semilla de catalogos se cargan en 002_seed_catalogos_merge.sql
+   mediante MERGE (upsert idempotente por clave natural). Antes vivian aqui
+   como bloques IF NOT EXISTS(...) + INSERT, que solo sembraban cuando la
+   tabla estaba vacia y por tanto nunca propagaban correcciones.
+   --------------------------------------------------------------------------- */
