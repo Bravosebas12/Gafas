@@ -1,6 +1,5 @@
 .kilocode/rules
 .kilocode/workflows
-.specify/
 .kilo/skills/frontend-design/
 .kilo/skills/modern-web-design/
 .kilo/skills/ux-ui-design/
@@ -12,3 +11,11 @@
 .github/copilot-instructions.md
 .vscode/settings.json
 .claude/skills/speckit-*/
+
+# Spec Kit - se ignora la herramienta (scripts, extensiones, estado local).
+# Se versionan la constitucion y las plantillas, porque llevan reglas del proyecto.
+.specify/*
+!.specify/memory/
+.specify/memory/*
+!.specify/memory/constitution.md
+!.specify/templates/
